@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Game Night Scorer</title>
+    <!--
+    ═══════════════════════════════════════════════════════════════════
+    Family Games Scorer
+    Copyright (c) 2026 Chris Egan
+    Licensed under MIT License
+    
+    A comprehensive board game and card game scorer for families and 
+    gaming groups. Track scores, manage players, view statistics, and 
+    roll dice for 53+ popular games.
+    
+    Original creation: January 2026
+    Repository: https://github.com/chrisjegan-web/family-game-scorer
+    ═══════════════════════════════════════════════════════════════════
+    -->
     <style>
         * {
             margin: 0;
@@ -1034,6 +1048,9 @@
         <div class="header">
             <h1>🎲 Family Game Night 🎲</h1>
             <p>Track scores, celebrate wins!</p>
+            <button onclick="openAbout()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5em; cursor: pointer; color: white; opacity: 0.8; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'" title="About">
+                ℹ️
+            </button>
         </div>
 
         <!-- Who's Playing Button -->
@@ -1155,6 +1172,54 @@
                             Clear All
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Modal -->
+        <div id="aboutModal" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2>ℹ️ About Family Games Scorer</h2>
+                    <button class="close-modal" onclick="closeModal('aboutModal')">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">🎲🎮🃏</div>
+                    
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Family Games Scorer</h3>
+                    <p style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                        A comprehensive scoring app for board games and card games.<br>
+                        Track scores, manage players, view statistics, and roll dice!
+                    </p>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <p style="font-size: 0.9em; color: #555; margin-bottom: 10px;">
+                            <strong>✨ Features:</strong>
+                        </p>
+                        <p style="font-size: 0.85em; color: #666; line-height: 1.6;">
+                            • 53+ Games (Board & Card)<br>
+                            • Player Groups & Teams<br>
+                            • Game History & Statistics<br>
+                            • Dice Roller with Real Faces<br>
+                            • Mobile Optimized
+                        </p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; margin-top: 20px;">
+                        <p style="font-size: 0.85em; color: #999; margin-bottom: 5px;">
+                            Copyright © 2026 Chris Egan
+                        </p>
+                        <p style="font-size: 0.8em; color: #999; margin-bottom: 15px;">
+                            Licensed under MIT License
+                        </p>
+                        <p style="font-size: 0.8em; color: #999;">
+                            Version 1.0 • January 2026
+                        </p>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="closeModal('aboutModal')" style="margin-top: 20px; width: 100%;">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -3500,6 +3565,10 @@
 
         function cancelClearHistory() {
             closeModal('confirmClearModal');
+        }
+
+        function openAbout() {
+            document.getElementById('aboutModal').classList.add('show');
         }
 
         function closeModal(modalId) {

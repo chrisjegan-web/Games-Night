@@ -1,0 +1,3584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Game Night Scorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .whos-playing-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 20px;
+        }
+
+        .whos-playing-btn {
+            background: #4ecdc4;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            font-size: 1em;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: calc(100% - 40px);
+            max-width: 1200px;
+            font-weight: 700;
+        }
+
+        .whos-playing-btn:hover {
+            background: #45b8b0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .whos-playing-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .group-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .group-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .group-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .group-info {
+            flex: 1;
+        }
+
+        .group-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .group-stats {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .group-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .group-edit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+
+        .group-delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .player-avatar {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .edit-avatar-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .edit-avatar-picker .avatar-option {
+            font-size: 2em;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+
+        .edit-avatar-picker .avatar-option:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .edit-avatar-picker .avatar-option.selected {
+            background: #667eea;
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .player-selection-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .player-selection-item:hover {
+            background: #e8f0fe;
+        }
+
+        .player-selection-item.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .player-selection-item.selected .player-avatar {
+            filter: brightness(1.2);
+        }
+
+        .player-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .player-selection-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .screen {
+            display: none;
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Game Selection */
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .game-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .game-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .game-card:active {
+            transform: translateY(0);
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .game-icon {
+            font-size: 3em;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .game-info {
+            flex: 1;
+        }
+
+        .game-info h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .game-info p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .game-rules {
+            font-size: 0.85em;
+            color: #888;
+            font-style: italic;
+        }
+
+        .rules-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 8px;
+            transition: background 0.3s;
+        }
+
+        .rules-btn:hover {
+            background: #5568d3;
+        }
+
+        /* Scoring */
+        .score-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .score-header h2 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .round-info {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .player-score {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .player-score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .total-score {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .score-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .score-input-row input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .quick-score {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .quick-score button {
+            background: #e0e0e0;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .quick-score button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #00d2d3;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #00b8b9;
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Results */
+        .leaderboard {
+            margin-top: 20px;
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .rank-item.winner {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .rank-number {
+            font-size: 2em;
+            font-weight: 700;
+            margin-right: 15px;
+            min-width: 50px;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-info .name {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .rank-info .score {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .history-item strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .game-icon {
+                font-size: 2.5em;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            flex: 1;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: #ff4757;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            background: #e84352;
+        }
+
+        .modal-body {
+            line-height: 1.6;
+        }
+
+        .modal-body h3 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        /* History Styles */
+        .history-tab {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .history-tab button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .history-tab button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .game-history-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .game-history-item .date {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .game-history-item .game-name {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .game-history-item .winner {
+            color: #00d2d3;
+            font-weight: 600;
+        }
+
+        .game-history-item .scores {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .delete-history-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Navigation Bar Styles */
+        .nav-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:hover .nav-icon,
+        .nav-btn:hover .nav-text {
+            color: white;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        .nav-btn.active .nav-icon,
+        .nav-btn.active .nav-text {
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 2.5em;
+        }
+
+        .nav-text {
+            font-size: 1em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        #mainContent {
+            min-height: 400px;
+        }
+
+        .top-games-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .top-game-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .top-game-item:hover {
+            border-color: #667eea;
+            background: white;
+            transform: translateX(5px);
+        }
+
+        .top-game-rank {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            display: inline-block;
+            min-width: 50px;
+        }
+
+        .top-game-info {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .top-game-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .top-game-count {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .header p {
+                font-size: 0.9em;
+            }
+            
+            .nav-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 20px 15px;
+            }
+            
+            .nav-btn {
+                padding: 30px 15px;
+                min-height: 140px;
+                border-radius: 15px;
+                border-width: 3px;
+            }
+            
+            .nav-icon {
+                font-size: 3.5em;
+            }
+            
+            .nav-text {
+                font-size: 1.1em;
+                font-weight: 800;
+            }
+            
+            .whos-playing-btn {
+                padding: 12px 20px;
+                font-size: 0.95em;
+            }
+            
+            .game-card {
+                padding: 12px;
+                gap: 10px;
+            }
+            
+            .game-icon {
+                font-size: 2.5em;
+                min-width: 50px;
+            }
+            
+            .game-info h3 {
+                font-size: 1em;
+            }
+            
+            .game-info p {
+                font-size: 0.85em;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .dice-face {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .dice-dot {
+                width: 10px;
+                height: 10px;
+            }
+            
+            .dice-dot.top-left, .dice-dot.middle-left, .dice-dot.bottom-left {
+                left: 9px;
+            }
+            
+            .dice-dot.top-right, .dice-dot.middle-right, .dice-dot.bottom-right {
+                right: 9px;
+            }
+            
+            .dice-dot.top-left, .dice-dot.top-right {
+                top: 9px;
+            }
+            
+            .dice-dot.bottom-left, .dice-dot.bottom-right {
+                bottom: 9px;
+            }
+            
+            .edit-avatar-picker {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.95em;
+            }
+            
+            .player-score input {
+                font-size: 1.2em;
+                padding: 10px;
+            }
+        }
+
+        /* Stats Styles */
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .leaderboard-item.top {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-right: 15px;
+            min-width: 40px;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .leaderboard-stats {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .dice-face {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+
+        .dice-dot {
+            width: 14px;
+            height: 14px;
+            background: #667eea;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        /* Dot positions */
+        .dice-dot.top-left {
+            top: 12px;
+            left: 12px;
+        }
+
+        .dice-dot.top-right {
+            top: 12px;
+            right: 12px;
+        }
+
+        .dice-dot.middle-left {
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+        }
+
+        .dice-dot.middle-right {
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+        }
+
+        .dice-dot.bottom-left {
+            bottom: 12px;
+            left: 12px;
+        }
+
+        .dice-dot.bottom-right {
+            bottom: 12px;
+            right: 12px;
+        }
+
+        .dice-dot.center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes diceRoll {
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+            25% {
+                transform: scale(1.2) rotate(90deg);
+            }
+            50% {
+                transform: scale(0.9) rotate(180deg);
+            }
+            75% {
+                transform: scale(1.1) rotate(270deg);
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎲 Family Game Night 🎲</h1>
+            <p>Track scores, celebrate wins!</p>
+        </div>
+
+        <!-- Who's Playing Button -->
+        <div class="whos-playing-container">
+            <button class="whos-playing-btn" onclick="showWhosPlayingModal()">
+                <span style="font-size: 1.5em;">👥</span>
+                <span style="font-size: 1.1em; font-weight: 700;">Who's Playing?</span>
+            </button>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <button class="nav-btn active" onclick="showBoardGames()" id="boardGamesBtn">
+                <span class="nav-icon">🎲</span>
+                <span class="nav-text">Board Games</span>
+            </button>
+            <button class="nav-btn" onclick="showCardGames()" id="cardGamesBtn">
+                <span class="nav-icon">🃏</span>
+                <span class="nav-text">Card Games</span>
+            </button>
+            <button class="nav-btn" onclick="showSearch()" id="searchBtn">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-text">Search</span>
+            </button>
+            <button class="nav-btn" onclick="showStats()" id="statsBtn">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Stats</span>
+            </button>
+        </div>
+
+        <!-- Modals -->
+        <div id="rulesModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span id="modalGameIcon" style="font-size: 2em;"></span>
+                    <h2 id="modalGameName"></h2>
+                    <button class="close-modal" onclick="closeModal('rulesModal')">&times;</button>
+                </div>
+                <div class="modal-body" id="modalRulesContent"></div>
+            </div>
+        </div>
+
+        <div id="whosPlayingModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📋 Select Your Group</h2>
+                    <button class="close-modal" onclick="closeModal('whosPlayingModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #667eea;">Choose Group:</label>
+                        <select id="groupSelector" onchange="onGroupSelected(this.value)" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em;">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="showManageGroups()" style="width: 100%; margin-bottom: 20px;">
+                        ⚙️ Manage Teams
+                    </button>
+
+                    <div id="noGroupsMessage" style="display: none; text-align: center; padding: 30px; color: #999;">
+                        <p style="font-size: 1.1em; margin-bottom: 15px;">No groups created yet!</p>
+                        <p>Click "Manage Teams" to create your first group.</p>
+                    </div>
+
+                    <div id="playerChecklistContainer" style="display: none;">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Select Players:</h3>
+                        
+                        <div class="player-selection-item" onclick="toggleAllPlayers()" id="selectAllOption" style="margin-bottom: 15px; background: #f0f4ff;">
+                            <input type="checkbox" class="player-checkbox" id="allPlayersCheckbox" onclick="event.stopPropagation(); toggleAllPlayers()">
+                            <div class="player-selection-info">
+                                <span style="font-weight: 700; font-size: 1.1em;">All Players</span>
+                            </div>
+                        </div>
+
+                        <div id="playerChecklist"></div>
+
+                        <button class="btn btn-success" onclick="continueWithSelectedPlayers()" id="continuePlayersBtn" disabled style="width: 100%; margin-top: 20px;">
+                            Continue to Games →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="manageGroupsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚙️ Manage Groups</h2>
+                    <button class="close-modal" onclick="closeModal('manageGroupsModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: #666; margin-bottom: 20px;">Create different groups for different gaming crews. Each group has its own players, history, and stats!</p>
+                    
+                    <div class="group-input">
+                        <input type="text" id="newGroupName" placeholder="Enter new group name..." />
+                        <button class="btn btn-primary" onclick="createNewGroup()">Create Group</button>
+                    </div>
+
+                    <h3 style="margin: 30px 0 15px 0; color: #667eea;">Your Groups</h3>
+                    <div id="groupsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Clear History Modal -->
+        <div id="confirmClearModal" class="modal">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header" style="background: #ff4757; color: white;">
+                    <h2>⚠️ Clear History?</h2>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmClearMessage" style="font-size: 1.1em; margin-bottom: 30px; text-align: center;"></p>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button class="btn btn-secondary" onclick="cancelClearHistory()" style="flex: 1; padding: 15px;">
+                            Cancel
+                        </button>
+                        <button class="btn btn-danger" onclick="confirmClearHistory()" style="flex: 1; padding: 15px;">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="mainContent" class="card">
+            <!-- Search Section -->
+            <div id="searchSection" style="display: none;">
+                <div class="search-container">
+                    <input type="text" id="gameSearch" placeholder="🔍 Search all games..." />
+                </div>
+                <div id="searchResults"></div>
+            </div>
+
+            <!-- Stats Section -->
+            <div id="statsSection" style="display: none;">
+                <div class="history-tab">
+                    <button class="active" onclick="showHistoryTab()">Game History</button>
+                    <button onclick="showStatsTab()">Player Stats</button>
+                </div>
+                <div id="historyTabContent">
+                    <div id="historyContent"></div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button type="button" 
+                                class="btn btn-danger" 
+                                id="clearHistoryBtn"
+                                style="padding: 15px 30px; font-size: 1.1em; cursor: pointer; min-height: 50px; min-width: 200px;">
+                            🗑️ Clear Group History
+                        </button>
+                    </div>
+                </div>
+                <div id="statsTabContent" style="display: none;">
+                    <div id="statsContent"></div>
+                </div>
+            </div>
+
+            <!-- Games Grid -->
+            <div id="gamesGrid" class="game-grid"></div>
+        </div>
+
+        <!-- Screen 1: Who's Playing (Player Selection) -->
+        <!-- Screen 2: Player Setup -->
+        <!-- Screen 3: Scoring -->
+        <div id="scoring" class="screen">
+            <div class="card">
+                <div class="score-header">
+                    <h2 id="scoringGameName"></h2>
+                    <div class="round-info" id="roundInfo"></div>
+                </div>
+
+                <!-- Dice Roller -->
+                <div id="diceRoller" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <div style="margin-bottom: 15px;">
+                        <select id="diceType" style="padding: 8px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; margin-right: 10px;">
+                            <option value="1d6">1d6 (1 die)</option>
+                            <option value="2d6">2d6 (2 dice)</option>
+                            <option value="3d6">3d6 (3 dice)</option>
+                            <option value="1d20">1d20 (D20)</option>
+                            <option value="1d4">1d4 (D4)</option>
+                            <option value="1d8">1d8 (D8)</option>
+                            <option value="1d10">1d10 (D10)</option>
+                            <option value="1d12">1d12 (D12)</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="rollDice()" style="padding: 8px 20px;">
+                            🎲 Roll Dice
+                        </button>
+                    </div>
+                    <div id="diceResult" style="font-size: 3em; min-height: 60px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #667eea;"></div>
+                    <div id="diceHistory" style="margin-top: 10px; font-size: 0.9em; color: #666; min-height: 20px;"></div>
+                </div>
+
+                <div id="scoreInputs"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="previousRound()">← Previous</button>
+                    <button class="btn btn-primary" onclick="nextRound()">Next Round →</button>
+                </div>
+                <button class="btn btn-success" onclick="finishGame()">Finish Game</button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Results -->
+        <div id="results" class="screen">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #667eea; text-align: center;">🏆 Final Results 🏆</h2>
+                <div id="leaderboard"></div>
+                
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">Round History</h3>
+                <div id="roundHistory"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="returnToHome()">🏠 Return to Home</button>
+                    <button class="btn btn-primary" onclick="newGame()">👥 New Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Database
+        const boardGames = [
+            {
+                            id: 'azul',
+                            name: 'Azul',
+                            icon: '🔷',
+                            category: 'board',
+                            description: 'Tile-drafting and pattern building',
+                            players: '2-4 players',
+                            duration: '30-45 min',
+                            ageRange: '8+',
+                            scoring: 'Points for placed tiles and patterns',
+                            scoringRules: 'Points for tile placement, completed rows/columns, and sets. Penalties for broken tiles.',
+                            setup: 'Place factory displays in a circle. Fill each with 4 tiles from the bag. Each player gets a board. First player marker goes in the center.',
+                            detailedRules: 'Draft colorful tiles from factory displays. Take all tiles of one color from a factory. Incomplete tiles go to floor (negative points). Place tiles on your board in pattern lines, then move completed lines to wall scoring area. Score points based on adjacent tiles. Bonus points for completing rows (2pts), columns (7pts), or all 5 of one color (10pts). Game ends when someone completes a row. Highest total wins.',
+                            quickScores: [1, 2, 3, 5, 7, 10, -1, -2, -3, -5]
+                        },
+            {
+                            id: 'backgammon',
+                            name: 'Backgammon',
+                            icon: '⚫',
+                            category: 'board',
+                            description: 'Ancient dice and strategy race game',
+                            players: '2 players',
+                            duration: '30-45 min',
+                            ageRange: '8+',
+                            scoring: 'Points for winning games, gammons, and backgammons',
+                            scoringRules: 'Win = 1 point. Gammon (opponent has pieces in home or on bar) = 2 points. Backgammon (opponent in home or on bar with piece on your board) = 3 points. Doubling cube multiplies stakes.',
+                            setup: 'Each player places 15 checkers in starting position: 2 on 24-point, 5 on 13-point, 3 on 8-point, 5 on 6-point. Determine first player by rolling dice (highest goes first).',
+                            detailedRules: 'Move checkers according to dice rolls, moving them around the board toward your home board. Multiple checkers on a point create a block. Single checkers (blots) can be hit and sent to the bar. From the bar, you must re-enter in opponent\'s home board before making other moves. First to bear off all 15 checkers wins. Use doubling cube to increase stakes during the game. Match play typically goes to 5, 7, or 11 points.',
+                            quickScores: [1, 2, 3]
+                        },
+            {
+                            id: 'blokus',
+                            name: 'Blokus',
+                            icon: '🟦',
+                            category: 'board',
+                            description: 'Abstract territory control with polyomino pieces',
+                            players: '2-4 players',
+                            duration: '20-30 min',
+                            ageRange: '5+',
+                            scoring: 'Points based on pieces played and remaining',
+                            scoringRules: 'Score = total squares of unplayed pieces (negative). If you play all pieces = +15 bonus. If last piece was the single square = additional +5 bonus. Lowest score wins.',
+                            setup: 'Each player gets 21 pieces in their color (all polyominoes from 1 to 5 squares). Place board in center. Each player chooses a corner to start from.',
+                            detailedRules: 'First piece must touch your corner. Subsequent pieces must touch corner-to-corner with your own pieces (not edge-to-edge). Pieces can touch edges of other players\' pieces. No overlapping. Try to play as many pieces as possible while blocking opponents. Game ends when no one can place more pieces. Count squares in unplayed pieces as negative points. Lowest score (or highest if all play all pieces) wins.',
+                            quickScores: [-5, -10, -15, -20, 0, 15, 20]
+                        },
+            {
+                            id: 'camel_up',
+                            name: 'Camel Up',
+                            icon: '🐪',
+                            category: 'board',
+                            description: 'Camel racing betting game',
+                            players: '2-8 players',
+                            duration: '20-30 min',
+                            ageRange: '8+',
+                            scoring: 'Money from betting on camel races',
+                            scoringRules: 'Earn money by betting on leg winners and race winners. Most money at end wins.',
+                            setup: 'Set up race track pyramid. Place 5 camels at start. Give each player betting cards and pyramid tiles. Shuffle leg betting tiles.',
+                            detailedRules: 'Each turn: bet on leg winner, take money, roll dice (move camels), or place desert tile. Pyramid dice roller determines which camel moves how far. Camels stack - carry riders along. Leg ends when all 5 dice rolled. Score leg bets (1st place = 5/3/2/1, 2nd = 1). After final leg, score overall race bets. Desert tiles give bonuses. Most money wins.',
+                            quickScores: [1, 2, 3, 5, 8]
+                        },
+            {
+                            id: 'carcassonne',
+                            name: 'Carcassonne',
+                            icon: '🏰',
+                            category: 'board',
+                            description: 'Tile-laying medieval city building',
+                            players: '2-5 players',
+                            duration: '30-45 min',
+                            ageRange: '7+',
+                            scoring: 'Points for completed cities, roads, monasteries',
+                            scoringRules: 'Completed features score points. Cities = 2pts per tile, Roads = 1pt per tile, Monasteries = 9pts',
+                            setup: 'Place the starting tile. Shuffle remaining tiles face down. Each player gets 7 followers (meeples) in their color. Determine first player.',
+                            detailedRules: 'Draw and place a tile each turn to build the landscape. Place followers (meeples) on features: roads, cities, monasteries, or fields. Score when features complete. Cities: 2 points per tile + 2 per shield. Roads: 1 point per tile. Monasteries: 1 point per surrounding tile (9 max). At game end, incomplete features score half. Fields score 3 points per completed city they touch. Player with most followers on a feature scores it. Highest total wins.',
+                            quickScores: [1, 2, 3, 4, 6, 9]
+                        },
+            {
+                            id: 'cascadia',
+                            name: 'Cascadia',
+                            icon: '🌲',
+                            category: 'board',
+                            description: 'Wildlife habitat building puzzle',
+                            players: '1-4 players',
+                            duration: '30-45 min',
+                            ageRange: '10+',
+                            scoring: 'Habitat patterns and wildlife bonuses',
+                            scoringRules: 'Score largest habitat areas + wildlife scoring cards (unique each game). Highest total wins.',
+                            setup: 'Create habitat tile market with wildlife tokens. Each player starts with one habitat tile. Shuffle wildlife scoring cards (one per species). Display nature tokens.',
+                            detailedRules: 'Draft habitat tiles with wildlife tokens. Place tiles to build contiguous habitats (mountains, forests, prairies, wetlands, rivers). Place wildlife on matching terrain. Habitat scoring: largest contiguous area of each type scores points. Wildlife scoring: each species scores differently based on its drawn card (e.g., bears score for pairs, salmon for runs). Nature tokens can modify drafting.',
+                            quickScores: [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 18, 20]
+                        },
+            {
+                            id: 'catan',
+                            name: 'Catan (Settlers)',
+                            icon: '🏝️',
+                            category: 'board',
+                            description: 'Resource trading and building game',
+                            players: '3-4 players',
+                            duration: '60-90 min',
+                            ageRange: '10+',
+                            scoring: 'Victory points from settlements, cities, and cards',
+                            scoringRules: 'First to 10 victory points wins',
+                            setup: 'Arrange hexes randomly or by setup card. Place number tokens alphabetically (skip 7). Each player places 2 settlements and 2 roads. Youngest player goes first.',
+                            detailedRules: 'Build settlements (1pt), cities (2pts), and roads using resources (wood, brick, wheat, sheep, ore). Roll dice to collect resources from adjacent hexes. Trade with players or ports. Longest Road (2pts) and Largest Army (2pts) give bonuses. Development cards can give points or special actions. Robber blocks resources when 7 is rolled. First to 10 victory points wins. Expansion allows 5-6 players.',
+                            quickScores: [1, 2, 3, 4, 5]
+                        },
+            {
+                            id: 'checkers',
+                            name: 'Checkers (Draughts)',
+                            icon: '⚪',
+                            category: 'board',
+                            description: 'Classic jumping and capturing strategy',
+                            players: '2 players',
+                            duration: '20-40 min',
+                            ageRange: '4+',
+                            scoring: 'Win/Loss - Capture all opponent pieces or block all moves',
+                            scoringRules: 'Win by capturing all opponent pieces or blocking them so they cannot move. Track wins for match play.',
+                            setup: 'Use 8×8 board. Each player gets 12 pieces placed on dark squares of first 3 rows. Dark square on each player\'s left. Player with dark pieces goes first.',
+                            detailedRules: 'Move pieces diagonally forward one square. Jump opponent pieces to capture (remove from board). Multiple jumps in one turn are allowed and mandatory if available. Reaching opposite end promotes piece to "King" - can move/jump diagonally in any direction. Must make a jump if one is available. Win by capturing all opponent pieces or blocking them from moving. Draw if neither player can force a win.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'chess',
+                            name: 'Chess',
+                            icon: '♟️',
+                            category: 'board',
+                            description: 'Classic strategic warfare game',
+                            players: '2 players',
+                            duration: '30-90 min',
+                            ageRange: '5+',
+                            scoring: 'Win/Loss/Draw - Checkmate, resignation, or stalemate',
+                            scoringRules: 'Checkmate = win, Stalemate or threefold repetition = draw. Can track wins/draws for match play. Tournament scoring: Win=1pt, Draw=0.5pt, Loss=0pt.',
+                            setup: 'Set up 8×8 board with white square in bottom right. Place pieces in standard formation: Rooks corners, Knights beside them, Bishops next, Queen on matching color, King on remaining center square. Pawns fill second rank. White moves first.',
+                            detailedRules: 'Each piece moves differently: Pawns forward 1 (2 from start), capture diagonally. Rooks move straight. Bishops move diagonally. Knights move L-shape. Queen moves any direction. King moves 1 square any direction. Special moves: Castling (King+Rook), En passant (pawn capture). Check = King under attack (must be resolved). Checkmate = King in check with no escape (game over). Stalemate = no legal moves but not in check (draw). Other draws: insufficient material, 50-move rule, threefold repetition.',
+                            quickScores: [1, 0.5, 0]
+                        },
+            {
+                            id: 'clank',
+                            name: 'Clank!',
+                            icon: '⚔️',
+                            category: 'board',
+                            description: 'Deck-building dungeon adventure',
+                            players: '2-4 players',
+                            duration: '30-60 min',
+                            ageRange: '12+',
+                            scoring: 'Gold and artifacts minus damage taken',
+                            scoringRules: 'Score gold coins (1pt each) + artifacts (points vary). Escaping = +20pts. Die in dungeon = lose artifact points. Most points wins.',
+                            setup: 'Set up dungeon board. Each player starts with identical 10-card deck. Place dragon and clank cubes. Shuffle market cards and major/minor secrets.',
+                            detailedRules: 'Build your deck while exploring the dungeon. Play cards for movement, combat, and buying power. Make noise (clank) and risk dragon attacks. Grab an artifact, then race to escape before dying. Each card played may add clank cubes to the bag. Dragon attacks = draw cubes from bag, take damage if your color drawn. Score: gold + artifacts + mastery tokens + escape bonus - death penalties.',
+                            quickScores: [1, 2, 5, 7, 10, 15, 20, 25, -5, -10]
+                        },
+            {
+                            id: 'cluedo',
+                            name: 'Cluedo (Clue)',
+                            icon: '🔍',
+                            category: 'board',
+                            description: 'Mystery solving deduction game',
+                            players: '2-6 players',
+                            duration: '45-60 min',
+                            ageRange: '8+',
+                            scoring: 'Win/Loss - first to solve wins',
+                            scoringRules: 'First correct accusation wins. Can track wins over multiple games',
+                            setup: 'Place one suspect, weapon, and room card in envelope. Shuffle remaining cards and deal evenly. Place character tokens in starting rooms. Youngest player starts.',
+                            detailedRules: 'Solve the murder: WHO did it, with WHAT weapon, in WHICH room. One card of each type is secretly placed in the envelope. Roll dice, move to rooms, make suggestions. Players disprove suggestions by showing you one matching card. Use deduction to eliminate possibilities. When certain, make your accusation. Check the envelope - if correct you win! If wrong, you\'re out but continue disproving others\' suggestions.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'codenames',
+                            name: 'Codenames',
+                            icon: '🕵️',
+                            category: 'board',
+                            description: 'Word association party game',
+                            players: '4+ players (teams)',
+                            duration: '15-20 min',
+                            ageRange: '10+',
+                            scoring: 'Win/Loss - First team to find all their words',
+                            scoringRules: 'Team game: First to contact all their agents wins. Avoid assassin (instant loss)',
+                            setup: 'Lay out 25 word cards in 5×5 grid. Spymasters sit together, teammates opposite. Give one spymaster the key card showing agent locations. Split into 2 teams.',
+                            detailedRules: '25 word cards on table. Split into 2 teams. Spymasters give one-word clues linking multiple words. Their team guesses which words. 9 cards for one team, 8 for other, 7 neutral, 1 assassin. Spymaster says clue + number of words it relates to. Team discusses and touches cards. Keep guessing while correct. Wrong word or neutral ends turn. Opponent\'s word helps them. Assassin = instant loss. First team to contact all their agents wins.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'coup',
+                            name: 'Coup',
+                            icon: '🎩',
+                            category: 'board',
+                            description: 'Bluffing and deduction game',
+                            players: '2-6 players',
+                            duration: '15 min',
+                            ageRange: '13+',
+                            scoring: 'Win/Loss - Last player with influence cards wins',
+                            scoringRules: 'Last player with at least one influence card wins. Track wins for tournament play.',
+                            setup: 'Each player gets 2 coins and 2 influence cards (kept secret). Place treasury coins in center. Shuffle and place character deck.',
+                            detailedRules: 'Take actions each turn: Income (1 coin), Foreign Aid (2 coins), Coup (pay 7 coins to eliminate influence), or character actions (Duke/Assassin/Captain/Ambassador/Contessa). You can bluff about which characters you have. Other players can challenge or block. Failed challenges/blocks = lose influence. Coup at 10+ coins is mandatory. When you lose influence, reveal a card. Last player standing wins.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'dixit',
+                            name: 'Dixit',
+                            icon: '🎭',
+                            category: 'board',
+                            description: 'Storytelling image guessing game',
+                            players: '3-8 players',
+                            duration: '30 min',
+                            ageRange: '8+',
+                            scoring: 'Points for guessing and being guessed correctly',
+                            scoringRules: 'Storyteller scores if some (not all) players guess correctly. Guessers score for correct guesses. Everyone except storyteller scores if nobody or everybody guesses correctly.',
+                            setup: 'Each player gets voting tokens and a hand of 6 image cards. Place scoring track. Determine first storyteller.',
+                            detailedRules: 'Storyteller gives a clue (word/phrase/sound) based on one of their cards. Others play a card that matches the clue. Shuffle and reveal all cards. Players vote for the card they think is the storyteller\'s. Storyteller scores 3 if some (not all) guess correctly. Correct guessers score 3. Card owners score 1 per vote received (except storyteller). If all or none guess correctly, storyteller scores 0, others score 2. First to 30 wins.',
+                            quickScores: [1, 2, 3]
+                        },
+            {
+                            id: 'exploding_kittens',
+                            name: 'Exploding Kittens',
+                            icon: '💣',
+                            category: 'board',
+                            description: 'Russian roulette card game with kittens',
+                            players: '2-5 players',
+                            duration: '15 min',
+                            ageRange: '7+',
+                            scoring: 'Win/Loss - Last player remaining wins',
+                            scoringRules: 'Elimination game. Last player who hasn\'t exploded wins. Track wins over multiple rounds.',
+                            setup: 'Remove all Exploding Kittens and Defuse cards. Deal 1 Defuse to each player and 7 cards to each. Give each player 1 remaining Defuse (2 total). Insert Exploding Kittens (1 fewer than players) into deck and shuffle.',
+                            detailedRules: 'Draw cards until someone draws an Exploding Kitten. Play a Defuse card to survive (put kitten back in deck anywhere). If you can\'t defuse, you\'re eliminated. Play action cards before drawing: Skip (don\'t draw), See the Future (peek at top 3), Shuffle, Attack (next player takes 2 turns), etc. Play pairs or combos for special effects. Last player alive wins.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'forbidden_desert',
+                            name: 'Forbidden Desert',
+                            icon: '🏜️',
+                            category: 'board',
+                            description: 'Cooperative desert survival',
+                            players: '2-5 players',
+                            duration: '45 min',
+                            ageRange: '10+',
+                            scoring: 'Cooperative win/loss - harder than Forbidden Island',
+                            scoringRules: 'All players win by finding flying machine parts and escaping, or lose if storm reaches max, players die of thirst, or buried alive.',
+                            setup: 'Build desert grid. Each player chooses a role. Place flying machine parts randomly. Set storm level. Distribute water canteens.',
+                            detailedRules: 'Survive desert while excavating flying machine parts. Each turn: take 4 actions (move, clear sand, excavate, share water). Then draw storm cards (sandstorm moves, sun beats down = lose water, storm strength increases). Manage water carefully. Use equipment wisely. Dig up 4 machine parts and reach launch pad to escape. Harder difficulty = less water, stronger storm.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'forbidden_island',
+                            name: 'Forbidden Island',
+                            icon: '🏝️',
+                            category: 'board',
+                            description: 'Cooperative island escape game',
+                            players: '2-4 players',
+                            duration: '30 min',
+                            ageRange: '10+',
+                            scoring: 'Cooperative win/loss at different difficulty levels',
+                            scoringRules: 'All players win by collecting 4 treasures and escaping, or all lose if island sinks. Can play at different difficulty levels.',
+                            setup: 'Build island from tiles. Each player chooses a role. Place treasure figures. Shuffle treasure and flood decks. Set water level.',
+                            detailedRules: 'Work together to collect 4 treasures before island sinks. Each turn: take 3 actions (move, shore up tiles, give cards, capture treasures). Then draw 2 treasure cards (beware Waters Rise!). Then flood tiles. Island tiles sink permanently if flooded twice. Lose if: Fools Landing sinks, both tiles of a treasure sink before claiming it, any player can\'t reach dry land, or water level maxes out.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'horrified',
+                            name: 'Horrified',
+                            icon: '👹',
+                            category: 'board',
+                            description: 'Cooperative monster fighting',
+                            players: '1-5 players',
+                            duration: '60 min',
+                            ageRange: '10+',
+                            scoring: 'Cooperative win/loss',
+                            scoringRules: 'All players win by defeating all monsters, or all lose if terror reaches max or villagers run out.',
+                            setup: 'Choose monsters (difficulty varies). Set up board with villagers. Each player chooses a hero with unique ability. Place monster figures and shuffle their specific decks.',
+                            detailedRules: 'Move heroes to rescue villagers, gather items, and complete monster-specific tasks. Each monster has unique defeat conditions (Dracula needs stakes, Frankenstein needs items, etc.). After players act, monsters move and terrorize. Balance rescuing villagers with fighting monsters. Cooperative - discuss strategies. Win by defeating all chosen monsters.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'kingdomino',
+                            name: 'Kingdomino',
+                            icon: '🏞️',
+                            category: 'board',
+                            description: 'Domino drafting kingdom building',
+                            players: '2-4 players',
+                            duration: '15-20 min',
+                            ageRange: '8+',
+                            scoring: 'Points from land types × crowns',
+                            scoringRules: 'Each connected area: # of squares × # of crowns. 5×5 grid bonus = 10pts',
+                            setup: 'Each player gets a castle and 3D starting tile. Shuffle dominoes, reveal 4 per player. Place king tokens on selected tiles in number order.',
+                            detailedRules: 'Draft domino tiles to build a 5×5 kingdom. Each turn: place previously selected tile, then select next tile. Tiles must match terrain types when placed (like dominoes). Connected areas score: number of squares × number of crowns in that area. Bonus points: complete 5×5 grid (+10), castle in center (+5). Higher numbered tiles are more valuable but picked last. Discard if can\'t place legally. After all tiles placed, count points. Highest wins.',
+                            quickScores: [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 24, 30]
+                        },
+            {
+                            id: 'monopoly',
+                            name: 'Monopoly',
+                            icon: '🏠',
+                            category: 'board',
+                            description: 'Property trading board game',
+                            players: '2-8 players',
+                            duration: '60-180 min',
+                            ageRange: '8+',
+                            scoring: 'Total assets (cash + properties)',
+                            scoringRules: 'Last player remaining or highest net worth wins',
+                            setup: 'Each player starts with $1500 and chooses a token. Place tokens on GO. Banker controls money and property. Shuffle Chance and Community Chest cards. Youngest player rolls first.',
+                            detailedRules: 'Buy properties, charge rent, build houses and hotels. Landing on owned property requires payment to owner. Collect $200 passing GO. Landing on Chance/Community Chest draws cards. Free Parking is just a rest space. Jail requires doubles, $50, or Get Out of Jail card. If bankrupt to bank, properties auction. If bankrupt to player, they get everything. Last player with money wins, or play to time limit and count total assets.',
+                            quickScores: [50, 100, 200, 500, 1000, 1500]
+                        },
+            {
+                            id: 'pandemic',
+                            name: 'Pandemic',
+                            icon: '🦠',
+                            category: 'board',
+                            description: 'Cooperative disease fighting game',
+                            players: '2-4 players',
+                            duration: '45-60 min',
+                            ageRange: '8+',
+                            scoring: 'Win/Loss - Team wins or loses together',
+                            scoringRules: 'Cooperative: All players win by curing 4 diseases, or all lose if diseases spread too far',
+                            setup: 'Place research station in Atlanta. Infect 9 cities (3 at level 3, 3 at level 2, 3 at level 1). Deal role cards and 2-4 player cards per person. Set outbreak marker to 0, infection rate to 2.',
+                            detailedRules: 'Work as a team to cure 4 diseases before time runs out. Each player has a unique role with special abilities. On your turn: move, treat diseases, build research stations, share knowledge, or discover cures. After actions, draw 2 player cards (collect 5 matching color to cure disease). Then draw infection cards to spread diseases. Epidemics accelerate spread. Lose if: 8 outbreaks occur, run out of disease cubes, or player deck empties. Win by curing all 4 diseases.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'patchwork',
+                            name: 'Patchwork',
+                            icon: '🧵',
+                            category: 'board',
+                            description: 'Two-player tile-laying puzzle',
+                            players: '2 players',
+                            duration: '15-30 min',
+                            ageRange: '8+',
+                            scoring: 'Buttons earned minus empty spaces',
+                            scoringRules: 'Score buttons collected during game. Subtract 2 points per empty space on board. 7×7 patch bonus = +7pts. Highest score wins.',
+                            setup: 'Create quilt board for each player (9×9 grid). Arrange patch tiles in circle. Place time tokens on track. Each player starts with 5 buttons.',
+                            detailedRules: 'Take turns choosing patches from the 3 ahead of the neutral token. Pay buttons and time to place patch on your quilt. Advance your time token - may pass opponent multiple times, earning buttons. Special patches give button income. Goal: fill your 9×9 board. At end: score buttons earned - (2 × empty spaces) + 7-square bonus.',
+                            quickScores: [1, 2, 3, 5, 7, -2, -4, -6, -8, -10]
+                        },
+            {
+                            id: 'resistance_avalon',
+                            name: 'The Resistance: Avalon',
+                            icon: '🛡️',
+                            category: 'board',
+                            description: 'Social deduction team game',
+                            players: '5-10 players',
+                            duration: '30 min',
+                            ageRange: '13+',
+                            scoring: 'Team wins - Good vs Evil',
+                            scoringRules: 'Good team wins if 3 quests succeed. Evil team wins if 3 quests fail or they assassinate Merlin.',
+                            setup: 'Distribute role cards based on player count (Merlin, Percival, loyal servants vs Morgana, Assassin, Mordred, minions). Good outnumbers Evil.',
+                            detailedRules: 'Hidden roles: Good team knows nothing except Merlin (knows all Evil) and Percival (knows Merlin/Morgana). Evil team knows each other (except Mordred). Each round: leader proposes quest team, vote to approve, selected players secretly play success/fail. Need 3 successful quests to win. BUT if Good wins, Assassin can target Merlin - if correct, Evil wins! Bluffing, deduction, and discussion are key.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'rummikub',
+                            name: 'Rummikub',
+                            icon: '🎯',
+                            category: 'board',
+                            description: 'Tile manipulation game of numbers and sequences',
+                            players: '2-4 players',
+                            duration: '45-60 min',
+                            ageRange: '8+',
+                            scoring: 'Sum of tiles left in hand at end',
+                            scoringRules: 'First to go out wins. Losers score points for tiles remaining (negative)',
+                            setup: 'Place all tiles face down and mix. Each player draws 14 tiles and places them on their rack. Remaining tiles form the pool. Youngest player starts.',
+                            detailedRules: 'Create sets (3-4 same numbers, different colors) or runs (3+ consecutive numbers, same color). Initial meld must total 30+ points. After, you can manipulate existing sets on the table. If you can\'t play, draw a tile. First player to use all tiles wins. Other players score negative points equal to the sum of their remaining tiles.',
+                            quickScores: [0, -10, -20, -30, -50]
+                        },
+            {
+                            id: 'sagrada',
+                            name: 'Sagrada',
+                            icon: '🎨',
+                            category: 'board',
+                            description: 'Dice drafting stained glass window',
+                            players: '1-4 players',
+                            duration: '30-45 min',
+                            ageRange: '14+',
+                            scoring: 'Points from objectives and pattern completion',
+                            scoringRules: 'Score public objectives (×2) + private objective + favor tokens. Highest total wins.',
+                            setup: 'Each player gets a window pattern card (difficulty 3-6). Draft tool cards. Draw public and private objectives. Fill dice bag.',
+                            detailedRules: 'Draft and place colored dice on your window following placement rules (matching numbers/colors adjacent, follow pattern restrictions). Each round: draft dice in snake order. Use tool cards to bend rules (costs favor tokens). Score after 10 rounds: each public objective scores twice, private objective once, leftover favor tokens = 1pt each.',
+                            quickScores: [1, 2, 3, 4, 5, 6]
+                        },
+            {
+                            id: 'scrabble',
+                            name: 'Scrabble',
+                            icon: '📝',
+                            category: 'board',
+                            description: 'Word-building board game',
+                            players: '2-4 players',
+                            duration: '60-90 min',
+                            ageRange: '10+',
+                            scoring: 'Letter values plus board multipliers',
+                            scoringRules: 'Highest score wins. 50 point bonus for using all 7 tiles',
+                            setup: 'Place board in center. Put all letter tiles in bag. Each player draws 7 tiles. Player with tile closest to A goes first (blank beats all). Place tile racks so only you see your letters.',
+                            detailedRules: 'Form words on the board using letter tiles. Each letter has a point value. Premium squares: Double/Triple Letter Score, Double/Triple Word Score. Using all 7 tiles in one turn = 50 point bonus. Words must connect to existing words. Challenge invalid words. Game ends when tile bag is empty and one player uses all tiles, or no more plays possible. Highest total score wins.',
+                            quickScores: [2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30, 50]
+                        },
+            {
+                            id: 'sequence',
+                            name: 'Sequence',
+                            icon: '🃏',
+                            category: 'board',
+                            description: 'Card and board game strategy',
+                            players: '2-12 players (teams)',
+                            duration: '30-45 min',
+                            ageRange: '7+',
+                            scoring: 'First to 2 sequences wins',
+                            scoringRules: 'Get 5 chips in a row. Track rounds won',
+                            setup: 'Place board in center. Shuffle cards. Deal: 7 cards for 2 players, 6 for 3-4 players, 5 for 6 players, 4 for 8-9 players, 3 for 10-12 players. Each player/team gets chips.',
+                            detailedRules: 'Play cards from your hand to place chips on matching board spaces. Create sequences of 5 chips in a row (horizontal, vertical, or diagonal). Jacks are wild: Two-eyed Jacks place anywhere, One-eyed Jacks remove opponent\'s chip. Corner spaces are free for all players. First to complete required sequences wins (2 for 2-3 players/teams, 1 for 4+ players/teams).',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'splendor',
+                            name: 'Splendor',
+                            icon: '💎',
+                            category: 'board',
+                            description: 'Gem trading and development',
+                            players: '2-4 players',
+                            duration: '30-45 min',
+                            ageRange: '10+',
+                            scoring: 'Victory points from cards and nobles',
+                            scoringRules: 'First to 15 prestige points wins',
+                            setup: 'Place gem tokens by color (7 for 2 players, 5 for 3 players, 4 for 4 players; 5 gold for all). Arrange 3 rows of development cards (4 per row). Place 3 nobles (number of players + 1).',
+                            detailedRules: 'Collect gem tokens to buy development cards. Cards give permanent gem bonuses and prestige points. On your turn: take 3 different gems, 2 of same gem, reserve a card, or buy a card. Nobles visit if you have required cards (3 bonus points). First to 15 prestige points triggers final round. Finish the round, then player with most points wins. Tiebreaker: fewest cards purchased.',
+                            quickScores: [1, 2, 3, 4, 5]
+                        },
+            {
+                            id: 'sushi_go',
+                            name: 'Sushi Go!',
+                            icon: '🍣',
+                            category: 'board',
+                            description: 'Fast-paced card drafting sushi game',
+                            players: '2-5 players',
+                            duration: '15-20 min',
+                            ageRange: '8+',
+                            scoring: 'Points from sushi combinations over 3 rounds',
+                            scoringRules: 'Score after each round. Maki rolls: most = 6pts, 2nd = 3pts. Tempura: 5pts per pair. Sashimi: 10pts per set of 3. Dumplings: 1/3/6/10/15 for 1/2/3/4/5+. Nigiri × wasabi = 3x points. Puddings: most = 6pts, fewest = -6pts (after round 3).',
+                            setup: 'Shuffle deck. Deal cards: 10 for 2 players, 9 for 3 players, 8 for 4 players, 7 for 5 players. Keep pudding cards separate until end.',
+                            detailedRules: 'Pick and pass card drafting. Each turn: choose 1 card from hand, place face-down. Reveal simultaneously, then pass remaining cards left (round 1), right (round 2), left (round 3). Chopsticks lets you take 2 cards on a future turn. Score after each round except puddings (score at end). Play 3 rounds. Highest total wins.',
+                            quickScores: [1, 3, 5, 6, 10, 15, -6]
+                        },
+            {
+                            id: 'ticket',
+                            name: 'Ticket to Ride',
+                            icon: '🚂',
+                            category: 'board',
+                            description: 'Railway route building game',
+                            players: '2-5 players',
+                            duration: '30-60 min',
+                            ageRange: '8+',
+                            scoring: 'Points for routes and destinations',
+                            scoringRules: 'Points for claimed routes (1-15) + completed destinations - incomplete destinations',
+                            setup: 'Place board in center. Each player gets 45 trains and a color. Deal 4 train cards to each player. Deal 3 destination tickets, keep at least 2. Place train card decks face up and face down.',
+                            detailedRules: 'Claim railway routes by playing matching colored train cards. Longer routes = more points (1 train=1pt, 2=2, 3=4, 4=7, 6=15, 8=21). Complete destination tickets for bonus points, lose points if incomplete. Draw train cards, claim routes, or get new destinations each turn. Game ends when a player has 2 or fewer trains. Longest continuous route gets 10 bonus points. Highest total wins.',
+                            quickScores: [1, 2, 4, 7, 10, 15, -4, -7, -10, -15]
+                        },
+            {
+                            id: 'viticulture',
+                            name: 'Viticulture',
+                            icon: '🍷',
+                            category: 'board',
+                            description: 'Wine-making worker placement',
+                            players: '1-6 players',
+                            duration: '45-90 min',
+                            ageRange: '13+',
+                            scoring: 'Victory points from wine orders and buildings',
+                            scoringRules: 'First to 20 victory points triggers final round. After that round, highest score wins.',
+                            setup: 'Each player gets vineyard mat, workers, and starting resources. Set up action board. Shuffle visitor cards and wine order cards. Place victory point track.',
+                            detailedRules: 'Place workers on action spaces for: planting vines, building structures, making wine, fulfilling orders, or drawing cards. Game flows through 4 seasons. Plant vines, harvest grapes, crush into wine, fill orders for points. Visitor cards provide bonuses and special actions. Summer/Winter actions vary. Balance income, building, and scoring. First to 20 triggers endgame.',
+                            quickScores: [1, 2, 3, 4, 5, 6, 7]
+                        },
+            {
+                            id: 'wingspan',
+                            name: 'Wingspan',
+                            icon: '🦅',
+                            category: 'board',
+                            description: 'Bird collection and engine building',
+                            players: '1-5 players',
+                            duration: '40-70 min',
+                            ageRange: '10+',
+                            scoring: 'Points from birds, eggs, bonuses, and objectives',
+                            scoringRules: 'Birds = printed points. Eggs on cards = 1pt each. Bonus cards scored. End-of-round goals scored. Tucked cards = 1pt each.',
+                            setup: 'Give each player a player mat, 5 bird cards, 2 bonus cards, 5 food tokens. Set out bird feeder dice, goal board, and bird cards. Place food and egg tokens nearby.',
+                            detailedRules: 'Play birds to your habitats (forest, grassland, wetland) by paying food and egg costs. Activate habitat rows for actions: gain food, lay eggs, draw cards. Each bird has unique powers. Complete end-of-round goals for points. After 4 rounds, score: bird points + eggs + tucked cards + bonus cards + cached food. Highest score wins.',
+                            quickScores: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                        },
+            {
+                            id: 'yahtzee',
+                            name: 'Yahtzee',
+                            icon: '🎲',
+                            category: 'board',
+                            description: 'Dice rolling and scoring game',
+                            players: '2+ players',
+                            duration: '30 min',
+                            ageRange: '8+',
+                            scoring: '13 categories, bonus for upper section',
+                            scoringRules: 'Highest total score wins. 35pt bonus if upper section ≥ 63',
+                            setup: 'Each player gets a score sheet. Provide 5 dice and a dice cup. Determine first player (highest roll).',
+                            detailedRules: 'Roll 5 dice up to 3 times per turn. Score in one of 13 categories: Upper (1s through 6s - sum of matching dice), Lower (3 of a kind, 4 of a kind, Full House=25, Small Straight=30, Large Straight=40, Yahtzee=50, Chance=sum all). If upper section totals 63+, get 35 point bonus. Each category used once. After 13 rounds, highest total wins.',
+                            quickScores: [10, 20, 25, 30, 35, 40, 50]
+                        }
+        ];
+
+        const cardGames = [
+            {
+                            id: '500',
+                            name: '500 (Five Hundred)',
+                            icon: '🎴',
+                            category: 'card',
+                            description: 'Trick-taking card game with bidding',
+                            players: '2-6 players',
+                            duration: '30-45 min',
+                            ageRange: '10+',
+                            scoring: 'Bid tricks and make contract',
+                            scoringRules: 'First to 500 wins. Make bid = add points, fail = subtract bid value. Defenders: 10 pts per trick.',
+                            setup: '4 players: Remove 2s and 3s (except 3 of hearts and 3 of diamonds), add Joker. Deal 10 cards each, 3 to kitty. For 2-3 or 5-6 players, adjust deck accordingly.',
+                            detailedRules: 'Bid for number of tricks (6-10) and trump suit. Highest bidder plays alone or with partner vs opponents. Win the bid amount in tricks to score your bid\'s point value. Failing costs you that amount (goes negative). Opponents score 10 points per trick taken. Misère (lose all tricks) = special bid. First to 500 points wins. If multiple players reach 500, highest score wins.',
+                            quickScores: [10, 20, 30, 40, 60, 100, 120, 140, 160, 180, 200, 240, 340, 440, -40, -60, -100]
+                        },
+            {
+                            id: 'bridge',
+                            name: 'Bridge (Contract)',
+                            icon: '🃏',
+                            category: 'card',
+                            description: 'Advanced partnership trick-taking game',
+                            players: '4 players (2 teams)',
+                            duration: '60-120 min',
+                            ageRange: '12+',
+                            scoring: 'Points for contracts made, penalties for failures, bonuses',
+                            scoringRules: 'Score below line for tricks bid and made. Score above line for overtricks, bonuses, penalties. Game = 100 points below line. Rubber = best of 3 games. Slam bonuses: small slam (12 tricks) = 500/750, grand slam (13 tricks) = 1000/1500.',
+                            setup: 'Partners sit opposite. Shuffle and deal all 52 cards (13 each). Dealer\'s partner (dummy) will expose their hand after opening lead. Rotate dealer clockwise each hand.',
+                            detailedRules: 'Bidding phase: Each player bids level (1-7) and strain (♣♦♥♠NT), or passes. Bidding ends after 3 consecutive passes. Highest bidder\'s partner becomes dummy. Play phase: Player left of declarer leads. Must follow suit if possible. Highest card of led suit wins unless trumped. Winner leads next. Scoring: Points for making contract, penalties for failure. Vulnerable pairs (won 1 game) get higher scores and penalties. Game scoring and rubber bonuses add strategic depth.',
+                            quickScores: [20, 30, 40, 50, 100, 120, 150, 500, 750, 1000, 1500, -50, -100]
+                        },
+            {
+                            id: 'canasta',
+                            name: 'Canasta',
+                            icon: '🎴',
+                            category: 'card',
+                            description: 'Rummy-style meld and point game',
+                            players: '2-6 players',
+                            duration: '60-90 min',
+                            ageRange: '10+',
+                            scoring: 'Points from melds, canastas, and cards',
+                            scoringRules: 'Natural canasta (7 same rank, no wilds) = 500pts. Mixed canasta (with wilds) = 300pts. Red 3s = 100pts each. Going out bonus = 100pts. First to 5000 points wins.',
+                            setup: 'Use 2 standard decks plus 4 jokers (108 cards). Deal 11 cards to each player (15 for 2 players). Place remaining cards as stock. Turn top card for discard pile. Red 3s drawn are immediately placed and replaced.',
+                            detailedRules: 'Meld sets of 3+ same rank cards (can include wilds: 2s and jokers). Initial meld requires minimum points based on team score (0-1495=50, 1500-2995=90, 3000+=120). Canasta = 7 cards of same rank. Need at least one canasta to go out. On your turn: draw 2 cards or take discard pile (entire pile if you can meld top card). Then meld cards and discard. Red 3s are automatic bonuses. Black 3s block next player from taking discard pile. Going out ends round. Score melds, canastas, and bonuses minus cards in hand.',
+                            quickScores: [5, 10, 15, 20, 50, 100, 300, 500]
+                        },
+            {
+                            id: 'cribbage',
+                            name: 'Cribbage',
+                            icon: '🎯',
+                            category: 'card',
+                            description: 'Classic pegging and hand counting game',
+                            players: '2-4 players',
+                            duration: '30 min',
+                            ageRange: '8+',
+                            scoring: 'Pegging during play and counting hands',
+                            scoringRules: '15s=2pts, pairs=2pts, runs=1pt per card, flush=4-5pts, nobs=1pt. First to 121 points wins.',
+                            setup: 'Use standard deck. Use cribbage board for scoring. Deal 6 cards each (5 if 3 players). Discard to crib. Cut for starter.',
+                            detailedRules: 'Two phases: The Play and The Show. In The Play, alternate playing cards while counting total (can\'t exceed 31). Score for 15s (2pts), pairs (2pts), runs (1pt/card). Reset at 31. In The Show, count hand+starter: 15s (2pts each), pairs (2pts/6/12), runs (1pt/card), flush (4-5pts), nobs (J matching starter suit = 1pt). Dealer scores crib too. Move pegs on board. First to 121 wins (skunk at 91).',
+                            quickScores: [1, 2, 3, 4, 5, 6, 8, 12, 15, 24, 29]
+                        },
+            {
+                            id: 'dominion',
+                            name: 'Dominion',
+                            icon: '👑',
+                            category: 'card',
+                            description: 'Deck-building card game',
+                            players: '2-4 players',
+                            duration: '30-45 min',
+                            ageRange: '13+',
+                            scoring: 'Victory points from purchased cards',
+                            scoringRules: 'Count victory point cards. Estate=1, Duchy=3, Province=6. Highest wins.',
+                            setup: 'Each player starts with 7 Copper cards and 3 Estate cards shuffled together. Draw 5 cards. Select 10 Kingdom card piles for the supply. Place Victory and Treasure cards in supply.',
+                            detailedRules: 'Build your deck by buying cards each turn. Start with 7 Coppers and 3 Estates. Each turn: play Action cards (if any), buy one card with coins, discard hand, draw 5 new. Kingdom cards have special abilities. Buy Victory cards for points (but they clog your deck). Treasure cards give coins. Game ends when Province pile or 3 supply piles empty. Count victory points. Highest wins. Tiebreaker: fewest turns.',
+                            quickScores: [1, 3, 6, -1]
+                        },
+            {
+                            id: 'dutch_blitz',
+                            name: 'Dutch Blitz',
+                            icon: '💨',
+                            category: 'card',
+                            description: 'Fast-paced competitive solitaire',
+                            players: '2-4 players',
+                            duration: '10-15 min',
+                            ageRange: '8+',
+                            scoring: 'Points for cards played minus blitz pile remaining',
+                            scoringRules: 'Each card played in middle = 1pt. Each card left in blitz pile = -2pts. Highest score after multiple rounds wins.',
+                            setup: 'Each player uses their own 40-card deck (4 suits in their color). Deal 10-card blitz pile (only top card visible), 3 cards face up in row, hand of remaining cards.',
+                            detailedRules: 'Real-time simultaneous play (no turns). Build common piles in center 1-10 in ascending order by suit. Play from: blitz pile top card, 3 face-up cards, or hand. Refill face-up spots from blitz pile. Go through hand 3 cards at a time. First to empty blitz pile shouts "BLITZ!" Round ends, count cards in center (+1 each) minus cards in blitz pile (-2 each). Play multiple rounds, highest total wins.',
+                            quickScores: [1, 2, 5, 10, -2, -4, -6]
+                        },
+            {
+                            id: 'euchre',
+                            name: 'Euchre',
+                            icon: '🂡',
+                            category: 'card',
+                            description: 'Fast-paced trump trick-taking game',
+                            players: '4 players (2 teams)',
+                            duration: '30-45 min',
+                            ageRange: '10+',
+                            scoring: 'Points for tricks taken with trump',
+                            scoringRules: 'Win 3-4 tricks = 1 point. Win all 5 tricks (march) = 2 points. Defenders win (euchre) = 2 points. Going alone and winning all 5 = 4 points. First team to 10 points wins.',
+                            setup: 'Use 24-card deck (9-A of each suit). Deal 5 cards to each player in groups of 2-3. Turn up top card of remaining 4 (kitty) for trump bidding. Partners sit opposite.',
+                            detailedRules: 'Bidding: Each player can order up trump (turned card suit), pass, or call different suit. If all pass twice, deal new hand. Highest bidder\'s team must win 3+ of 5 tricks. Can "go alone" (partner sits out). Trump hierarchy: Jack of trump (right bower), Jack of same color (left bower), A-K-Q-10-9 of trump, then A-K-Q-J-10-9 of other suits. Follow suit if possible. Highest trump or highest card of led suit wins trick. Score points based on tricks won.',
+                            quickScores: [1, 2, 4]
+                        },
+            {
+                            id: 'gin_rummy',
+                            name: 'Gin Rummy',
+                            icon: '🃏',
+                            category: 'card',
+                            description: 'Two-player rummy card game',
+                            players: '2 players',
+                            duration: '20-30 min',
+                            ageRange: '8+',
+                            scoring: 'Points from unmatched cards and bonuses',
+                            scoringRules: 'Gin (all cards matched) = 25 bonus + opponent\'s deadwood. Knock = opponent\'s deadwood minus your deadwood. Undercut (opponent has less/equal deadwood) = 25 bonus + difference. Game bonus = 100. First to 100 points wins.',
+                            setup: 'Use standard 52-card deck. Deal 10 cards each. Place remaining cards face down as stock. Turn top card face up to start discard pile. Non-dealer goes first.',
+                            detailedRules: 'Form melds: sets (3-4 same rank) or runs (3+ consecutive same suit). Each turn: draw from stock or discard pile, then discard. Knock when deadwood (unmatched cards) ≤ 10 points. Reveal hands, lay melds. Opponent can lay off cards on your melds. Score difference in deadwood. Gin = all 10 cards in melds (can\'t lay off). Play multiple hands until someone reaches 100 points.',
+                            quickScores: [5, 10, 15, 20, 25, 30]
+                        },
+            {
+                            id: 'hand_and_foot',
+                            name: 'Hand and Foot',
+                            icon: '🦶',
+                            category: 'card',
+                            description: 'Canasta variant with two decks per player',
+                            players: '2-6 players',
+                            duration: '60-90 min',
+                            ageRange: '10+',
+                            scoring: 'Books and canastas with bonus requirements',
+                            scoringRules: 'Natural canasta=500, mixed canasta=300, red 3s=100 each (500 for all 4), going out=100. Must complete minimum meld requirements. First to 10,000 wins.',
+                            setup: 'Use 4-6 decks with jokers. Each player gets a "hand" and a "foot" (two sets of cards). Place red 3s immediately. Determine teams (if applicable).',
+                            detailedRules: 'Like Canasta but each player has Hand and Foot piles. Start with Hand. When Hand empties, pick up Foot. Must make books (7+ cards) to go out. Minimum meld requirements increase each round (50/90/120/150). Red 3s = 100 bonus each. Natural canasta (no wilds) = 500, Mixed (with wilds) = 300. Black 3s block pile. Must have 2 canastas (one clean) to go out. Going out bonus = 100.',
+                            quickScores: [50, 90, 100, 120, 150, 300, 500, 1000, -50, -100]
+                        },
+            {
+                            id: 'hearts',
+                            name: 'Hearts',
+                            icon: '♥️',
+                            category: 'card',
+                            description: 'Trick-taking avoidance card game',
+                            players: '4 players',
+                            duration: '30-45 min',
+                            ageRange: '10+',
+                            scoring: 'Avoid hearts (1pt each) and Queen of Spades (13pts)',
+                            scoringRules: 'Lowest score wins. Game to 100 points. Shooting the moon = 0 for you, 26 for others',
+                            setup: 'Use standard 52-card deck. Deal all cards evenly (13 per player). Before first trick, pass 3 cards: left (round 1), right (round 2), across (round 3), no pass (round 4). Repeat pattern.',
+                            detailedRules: 'Deal all cards. Player with 2 of Clubs leads first trick. Must follow suit if possible. Highest card of led suit wins trick. Hearts cannot be led until "broken" (played when you can\'t follow suit). Each heart = 1 point, Queen of Spades = 13 points. If you take ALL hearts and Queen of Spades (shooting the moon), you score 0 and others get 26. Game ends when someone reaches 100 points. Lowest score wins.',
+                            quickScores: [0, 1, 13, 26]
+                        },
+            {
+                            id: 'oh_hell',
+                            name: 'Oh Hell!',
+                            icon: '😈',
+                            category: 'card',
+                            description: 'Trick-taking bidding with exact prediction',
+                            players: '3-7 players',
+                            duration: '30 min',
+                            ageRange: '10+',
+                            scoring: 'Made bid = 10 points + bid amount',
+                            scoringRules: 'Bid exact tricks. Made bid = 10 + bid amount. Failed = 0 points. Highest total after all rounds wins.',
+                            setup: 'Use standard 52-card deck. Deal decreasing cards each round (start with 7-10, go down to 1). Flip card for trump each round.',
+                            detailedRules: 'Each round, deal cards face down. Flip one card for trump suit. Players bid exact number of tricks they\'ll take. Dealer bids last - total bids can\'t equal number of tricks available. Play tricks following suit, trump beats other suits. Score 10 points + bid amount if you make your exact bid, 0 if you miss. Play multiple rounds with decreasing hands. Highest total wins.',
+                            quickScores: [10, 11, 12, 13, 14, 15, 16, 17, 20, 0]
+                        },
+            {
+                            id: 'phase10',
+                            name: 'Phase 10',
+                            icon: '🔢',
+                            category: 'card',
+                            description: 'Rummy-type card game with phases',
+                            players: '2-6 players',
+                            duration: '60-90 min',
+                            ageRange: '7+',
+                            scoring: 'Complete 10 phases in order',
+                            scoringRules: 'First to complete all phases wins. Cards left = points (lower better)',
+                            setup: 'Shuffle deck including Wild and Skip cards. Deal 10 cards to each player. Place remaining deck face down as draw pile. Flip top card for discard pile.',
+                            detailedRules: 'Complete 10 specific phases in order: Phase 1 = 2 sets of 3, Phase 2 = 1 set of 3 + 1 run of 4, etc. Each round, try to complete your current phase, then play remaining cards on your phase or others\'. Skip cards skip next player. Wild cards substitute for any card. Round ends when one player discards last card. Players who didn\'t complete their phase score penalty points (5-50 per card) and try same phase next round. First to complete Phase 10 wins.',
+                            quickScores: [5, 10, 15, 25, 50]
+                        },
+            {
+                            id: 'pinochle',
+                            name: 'Pinochle',
+                            icon: '♠️',
+                            category: 'card',
+                            description: 'Trick-taking with melds',
+                            players: '4 players (2 teams)',
+                            duration: '60 min',
+                            ageRange: '12+',
+                            scoring: 'Points from melds and tricks',
+                            scoringRules: 'Meld scoring: Run (A-10-K-Q-J same suit)=150, Pinochle (Q♠+J♦)=40, Aces around=100, etc. Tricks: A=11, 10=10, K=4, Q=3, J=2. Last trick=10. First to 1000 wins.',
+                            setup: 'Use 48-card Pinochle deck (A-10-K-Q-J-9 doubled in 4 suits). Deal 12 cards each. Bid for trump.',
+                            detailedRules: 'Bid to name trump (minimum 20). High bidder names trump and leads. After bidding, show melds for points (royal marriage=40, common marriage=20, pinochle=40, aces around=100, run=150, etc.). Then play tricks. Must follow suit, must beat if possible. After tricks, count: Aces=11, Tens=10, Kings=4, Queens=3, Jacks=2, last trick=10. Made bid: add meld+tricks. Failed: subtract bid, opponents score their meld+tricks.',
+                            quickScores: [10, 20, 40, 60, 80, 100, 150, 200, 240, 300, 500, 1000, -20, -40, -60]
+                        },
+            {
+                            id: 'rook',
+                            name: 'Rook',
+                            icon: '🃏',
+                            category: 'card',
+                            description: 'Trick-taking bidding game with Rook card',
+                            players: '4 players (2 teams)',
+                            duration: '45 min',
+                            ageRange: '8+',
+                            scoring: 'Bid and make tricks for points',
+                            scoringRules: 'Made bid = add bid points. Failed bid = subtract bid points. 5s = 5pts, 10s/14s = 10pts, Rook = 20pts. First team to 500 wins.',
+                            setup: 'Use Rook deck (1-14 in 4 colors + Rook bird card). Deal 9-10 cards each (varies by players), 5 to nest. Partners sit opposite.',
+                            detailedRules: 'Bid for right to name trump color (70-200 in 5-point increments). High bidder takes nest, discards 5, names trump. Play tricks - must follow suit/color, highest trump or highest led color wins. Rook is highest trump. Count points in won tricks: 5=5pts, 10/14=10pts each, Rook=20pts. Made bid: add points. Failed: subtract bid. First team to 500 wins.',
+                            quickScores: [5, 10, 20, 70, 80, 90, 100, 110, 120, 140, 160, 180, 200, -70, -100]
+                        },
+            {
+                            id: 'rummy_500',
+                            name: 'Rummy 500',
+                            icon: '5️⃣',
+                            category: 'card',
+                            description: 'Rummy variant with cumulative scoring',
+                            players: '2-8 players',
+                            duration: '30 min',
+                            ageRange: '8+',
+                            scoring: 'Points for melds minus deadwood',
+                            scoringRules: 'Score card values for melds laid down. Ace = 15, Face cards = 10, others = pip value. Subtract unmelded cards. First to 500 (or -500) wins.',
+                            setup: 'Deal 7 cards each (13 if 2 players). Place rest as stock. Flip top card to start discard pile.',
+                            detailedRules: 'Draw from stock or take cards from discard pile (can take any card, must also take all above it). Meld sets (3-4 same rank) or runs (3+ consecutive same suit). Lay off cards on existing melds (yours or opponents\). Cumulative scoring: each round, score = value of melded cards minus value of cards left in hand. Aces=15, faces=10, number cards=pip value. First player to 500 points OR last player above 0 when someone goes negative wins.',
+                            quickScores: [5, 10, 15, 20, 25, 30, 40, 50, 100, -5, -10, -15]
+                        },
+            {
+                            id: 'seven_wonders',
+                            name: '7 Wonders',
+                            icon: '🏛️',
+                            category: 'card',
+                            description: 'Card drafting civilization game',
+                            players: '2-7 players',
+                            duration: '30-45 min',
+                            ageRange: '10+',
+                            scoring: 'Points from military, science, commerce, guilds, wonders',
+                            scoringRules: 'Total all victory points from multiple categories at game end',
+                            setup: 'Each player gets a Wonder board and 3 coins. Shuffle Age I cards, deal 7 to each player. Place conflict tokens between players. Separate Age II and III cards for later.',
+                            detailedRules: 'Build a civilization over 3 Ages. Draft cards simultaneously from hands, passing remainder to neighbor. Play cards for resources, military, science, commerce, or guilds. Build wonder stages for bonuses. Military: compare shields with neighbors (+1/-1 per win/loss). Science: complete sets for points. Commerce cards give coins/points. After Age III, total all points. Military victories, science sets, commerce, wonders, guilds, and coins/3 all contribute. Highest total wins.',
+                            quickScores: [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15]
+                        },
+            {
+                            id: 'skipbo',
+                            name: 'Skip-Bo',
+                            icon: '🎰',
+                            category: 'card',
+                            description: 'Sequencing card game',
+                            players: '2-6 players',
+                            duration: '30-45 min',
+                            ageRange: '7+',
+                            scoring: 'First to empty stock pile wins',
+                            scoringRules: 'Win/Loss - First to play all stock pile cards wins',
+                            setup: 'Deal 30 cards face down to each player for their stock pile. Turn top card face up. Remaining cards form draw pile. Each player has space for 4 discard piles.',
+                            detailedRules: 'Each player has a stock pile (30 cards face down). Goal: empty your stock pile first. Build sequences 1-12 on building piles (shared). You can have up to 4 personal discard piles. Skip-Bo cards are wild. Each turn: Draw to 5 cards, play from stock pile top card, hand, or discard piles. Build sequences in order. Turn ends when you discard. First to empty stock pile wins.',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'slapjack',
+                            name: 'Slapjack',
+                            icon: '🫱',
+                            category: 'card',
+                            description: 'Fast reflexes card slapping game',
+                            players: '2-8 players',
+                            duration: '10 min',
+                            ageRange: '4+',
+                            scoring: 'Win all cards or track round wins',
+                            scoringRules: 'Win by collecting all cards. Or play multiple rounds and track wins.',
+                            setup: 'Deal entire standard deck evenly to all players. Players hold cards face down without looking.',
+                            detailedRules: 'Players take turns flipping top card to center pile. When a Jack appears, race to slap it! First to slap collects the pile. False slap = give one card to pile. If you run out of cards, you can still slap in - get one more chance to slap a Jack. Last player with cards wins. Great for kids and quick reflexes!',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'spades',
+                            name: 'Spades',
+                            icon: '♠️',
+                            category: 'card',
+                            description: 'Partnership trick-taking bidding game',
+                            players: '4 players (2 teams)',
+                            duration: '45-60 min',
+                            ageRange: '10+',
+                            scoring: 'Points for making bids, penalties for bags and failures',
+                            scoringRules: 'Make bid = 10 × bid. Each overtrick (bag) = 1 point. 10 bags = -100 penalty. Fail bid = -10 × bid. Nil bid (0 tricks): made = 100 bonus, failed = -100. First to 500 wins.',
+                            setup: 'Use standard 52-card deck. Deal all cards (13 each). Partners sit opposite. Spades are always trump. Determine first dealer randomly.',
+                            detailedRules: 'Bidding: Each player bids number of tricks they\'ll win (or Nil). Partners\' bids combine. Play: Player left of dealer leads. Must follow suit if possible. Spades are trump (beat all other suits). Highest spade or highest card of led suit wins. Can\'t lead spades until "broken" (played when can\'t follow suit) or only spades remain. Scoring: Make combined bid = 10 × bid + bags. Fail = -10 × bid. Accumulate 10 bags = -100. Nil made = +100, failed = -100 (partner\'s tricks don\'t count toward Nil). First to 500 wins.',
+                            quickScores: [1, 10, 20, 30, 40, 50, 100, -10, -20, -30, -40, -50, -100]
+                        },
+            {
+                            id: 'the_mind',
+                            name: 'The Mind',
+                            icon: '🧠',
+                            category: 'card',
+                            description: 'Cooperative synchronization without talking',
+                            players: '2-4 players',
+                            duration: '15 min',
+                            ageRange: '8+',
+                            scoring: 'Cooperative - beat levels together',
+                            scoringRules: 'Win by completing all levels (12 for 2 players, 10 for 3, 8 for 4). Lose 3 lives = game over. Track successful levels.',
+                            setup: 'Shuffle cards 1-100. Determine number of levels by player count. Give each player lives and throwing stars tokens.',
+                            detailedRules: 'Silent cooperation - no talking or signals. Each level, players receive that number of cards (Level 1=1 card, Level 2=2 cards, etc.). As a team, play all cards to center pile in ascending order. No turns - anyone can play when they feel the timing is right. Wrong card = lose a life. Use throwing star to discard everyone\'s lowest card. Beat all levels to win. Tension builds as you silently coordinate!',
+                            quickScores: [1, 0]
+                        },
+            {
+                            id: 'uno',
+                            name: 'UNO',
+                            icon: '🎴',
+                            category: 'card',
+                            description: 'Classic card game of matching colors and numbers',
+                            players: '2-10 players',
+                            duration: '15-30 min',
+                            ageRange: '7+',
+                            scoring: 'Points awarded for cards left in opponents\' hands',
+                            scoringRules: 'First to 500 wins. Cards: 0-9 = face value, Skip/Reverse/Draw 2 = 20pts, Wild/Wild Draw 4 = 50pts',
+                            setup: 'Shuffle deck. Deal 7 cards to each player. Place remaining deck face down as draw pile. Flip top card to start discard pile. Player left of dealer starts.',
+                            detailedRules: 'Players race to empty their hand by matching the color or number of the top card. Special cards include Skip (next player loses turn), Reverse (change direction), Draw Two (next player draws 2 cards), Wild (change color), and Wild Draw Four (change color and next player draws 4). When you have one card left, shout "UNO!". Winner scores points for all cards remaining in opponents\' hands. First to 500 total points wins.',
+                            quickScores: [0, 10, 20, 30, 50]
+                        },
+            {
+                            id: 'wizard',
+                            name: 'Wizard',
+                            icon: '🧙',
+                            category: 'card',
+                            description: 'Trick-taking with Wizards and Jesters',
+                            players: '3-6 players',
+                            duration: '45 min',
+                            ageRange: '10+',
+                            scoring: 'Bid exact tricks, earn 20 + 10 per trick',
+                            scoringRules: 'Made bid exactly = 20 + 10 per trick bid. Over/under = -10 per trick difference. After final round, highest score wins.',
+                            setup: 'Use Wizard deck (52 regular cards + 4 Wizards + 4 Jesters). Determine number of rounds by players.',
+                            detailedRules: 'Deal increasing number of cards each round (Round 1=1 card, Round 2=2 cards, etc.). Flip top card for trump (unless Wizard/Jester). Bid exact number of tricks you\'ll take. Play tricks: Wizards always win, Jesters always lose. Must follow suit if possible. Trump beats other suits. Scoring: bid exactly = 20 + (10 × tricks bid). Miss by any amount = -10 per trick difference. Play until cards run out.',
+                            quickScores: [10, 20, 30, 40, 50, 60, 70, 80, -10, -20, -30, -40]
+                        }
+        ];
+
+        // Combine all games for searching
+        const games = [...boardGames, ...cardGames];
+
+        // Groups and player management
+        let groups = {}; // { groupName: { players: [{name, avatar}], history: [] } }
+        let currentGroup = 'Default'; // Current active group
+        
+        let currentGame = null;
+        let players = []; // Array of {name, avatar} objects
+        let currentRound = 1;
+        let scores = {}; // {playerName: [round1Score, round2Score, ...]}
+        let gameHistory = []; // Array of completed games for current group
+
+        // Available emoji avatars (removed first 4 faces, added sports)
+        const avatarEmojis = [
+            '⚪', // No avatar option
+            '😺', '🐶', '🐼', '🦊', '🐸', '🦁', '🐯', '🐨', '🐷', '🐮', '🦄', '🐙', '🦖', 
+            '🤖', '👽', 
+            '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🏒', '🏑', '⛳', '🏹', '🎣',
+            '🎮', '🎲', '🎯', '🏆', '⭐', '🔥', '💎', '🎸', '🚀', '⚡', '🌈'
+        ];
+
+        // Win condition definitions for each game
+        const winConditions = {
+            'uno': { type: 'first_to_score', target: 500, higher_wins: true },
+            '500': { type: 'first_to_score', target: 500, higher_wins: true },
+            'yahtzee': { type: 'highest_after_rounds', rounds: 13 },
+            'scrabble': { type: 'manual' }, // Ends when tiles run out
+            'hearts': { type: 'first_to_score', target: 100, higher_wins: false }, // Lowest wins
+            'phase10': { type: 'manual' }, // First to complete all phases
+            'gin_rummy': { type: 'first_to_score', target: 100, higher_wins: true },
+            'canasta': { type: 'first_to_score', target: 5000, higher_wins: true },
+            'spades': { type: 'first_to_score', target: 500, higher_wins: true },
+            'euchre': { type: 'first_to_score', target: 10, higher_wins: true },
+            'catan': { type: 'first_to_score', target: 10, higher_wins: true },
+            'splendor': { type: 'first_to_score', target: 15, higher_wins: true },
+            'azul': { type: 'manual' }, // Ends when someone completes a row
+            'ticket': { type: 'manual' }, // Ends when trains run low
+            'seven_wonders': { type: 'rounds_then_highest', rounds: 3 },
+            'kingdomino': { type: 'manual' }, // Ends after all dominoes placed
+            'dominion': { type: 'manual' }, // Ends when Province pile or 3 piles empty
+            'rummikub': { type: 'round_winner' }, // First to empty tiles wins round
+            'cluedo': { type: 'round_winner' }, // First correct accusation wins
+            'sequence': { type: 'round_winner' }, // First to required sequences wins
+            'codenames': { type: 'round_winner' }, // First team to contact all agents wins
+            'skipbo': { type: 'round_winner' }, // First to empty stock pile wins
+            'exploding_kittens': { type: 'round_winner' }, // Last player standing wins
+            'sushi_go': { type: 'rounds_then_highest', rounds: 3 },
+            'chess': { type: 'round_winner' }, // Checkmate/resignation/draw
+            'checkers': { type: 'round_winner' }, // Capture all or block all moves
+            'backgammon': { type: 'match_play', target: 5 }, // Typically to 5, 7, or 11
+            'blokus': { type: 'manual' }, // Ends when no one can play
+            'monopoly': { type: 'manual' }, // Last player with money or highest assets
+            'pandemic': { type: 'round_winner' }, // Team wins or loses together
+            'carcassonne': { type: 'manual' } // Ends when all tiles placed
+        };
+
+        // Initialize
+        function init() {
+            loadGroups();
+            loadCurrentGroup();
+            setupGameSearch();
+            showBoardGames(); // Show board games by default - user clicks "Who's Playing?" when ready
+        }
+
+        function showScreen(screenId) {
+            // Hide all game flow screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Hide main content when in game flow
+            if (screenId !== 'mainContent') {
+                document.getElementById('mainContent').style.display = 'none';
+                document.querySelector('.nav-bar').style.display = 'none';
+            }
+            
+            // Show the requested screen
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+        }
+
+        function showMainContent() {
+            // Hide all game flow screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show main content and nav
+            document.getElementById('mainContent').style.display = 'block';
+            document.querySelector('.nav-bar').style.display = 'grid';
+        }
+
+        function setActiveNav(btnId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(btnId).classList.add('active');
+        }
+
+        function hideAllSections() {
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('gamesGrid').style.display = 'none';
+        }
+
+        function showBoardGames() {
+            showMainContent();
+            setActiveNav('boardGamesBtn');
+            hideAllSections();
+            document.getElementById('gamesGrid').style.display = 'block';
+            renderGames('board');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showCardGames() {
+            showMainContent();
+            setActiveNav('cardGamesBtn');
+            hideAllSections();
+            document.getElementById('gamesGrid').style.display = 'block';
+            renderGames('card');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showSearch() {
+            showMainContent();
+            setActiveNav('searchBtn');
+            hideAllSections();
+            document.getElementById('searchSection').style.display = 'block';
+            document.getElementById('gameSearch').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showStats() {
+            showMainContent();
+            setActiveNav('statsBtn');
+            hideAllSections();
+            document.getElementById('statsSection').style.display = 'block';
+            loadHistory();
+            showHistoryTab();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setupGameSearch() {
+            const searchInput = document.getElementById('gameSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    renderSearchResults(searchTerm);
+                });
+            }
+        }
+
+        function renderSearchResults(searchTerm) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">Start typing to search games...</p>';
+                return;
+            }
+
+            const allGames = [...boardGames, ...cardGames];
+            
+            // Separate games by match type
+            const startsWithMatches = allGames.filter(game => 
+                game.name.toLowerCase().startsWith(searchTerm)
+            );
+            
+            const containsMatches = allGames.filter(game => 
+                !game.name.toLowerCase().startsWith(searchTerm) && 
+                (game.name.toLowerCase().includes(searchTerm) ||
+                 game.description.toLowerCase().includes(searchTerm))
+            );
+            
+            // Combine with priority: starts with first, then contains
+            const filtered = [...startsWithMatches, ...containsMatches];
+
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No games found</p>';
+                return;
+            }
+
+            resultsDiv.innerHTML = filtered.map(game => `
+                <div class="game-card" onclick="selectGame('${game.id}')" ontouchstart="">
+                    <div class="game-icon">${game.icon}</div>
+                    <div class="game-info">
+                        <h3>${game.name}</h3>
+                        <p>${game.description}</p>
+                        <p style="font-weight: 600; color: #444;">${game.players}</p>
+                        <p style="font-size: 0.85em; color: #666; margin-bottom: 5px;">
+                            ⏱️ ${game.duration} • 👤 Ages ${game.ageRange}
+                        </p>
+                        <p class="game-rules">${game.scoringRules}</p>
+                        <button class="rules-btn" onclick="event.stopPropagation(); showRules('${game.id}')">
+                            📖 Detailed Rules
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderGames(category) {
+            const grid = document.getElementById('gamesGrid');
+            const gamesToShow = category === 'board' ? boardGames : cardGames;
+            const title = category === 'board' ? '🎲 Board Games' : '🃏 Card Games';
+
+            grid.innerHTML = `<h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 1.4em;">${title}</h3>` +
+                gamesToShow.map(game => `
+                <div class="game-card" onclick="selectGame('${game.id}')" ontouchstart="">
+                    <div class="game-icon">${game.icon}</div>
+                    <div class="game-info">
+                        <h3>${game.name}</h3>
+                        <p>${game.description}</p>
+                        <p style="font-weight: 600; color: #444;">${game.players}</p>
+                        <p style="font-size: 0.85em; color: #666; margin-bottom: 5px;">
+                            ⏱️ ${game.duration} • 👤 Ages ${game.ageRange}
+                        </p>
+                        <p class="game-rules">${game.scoringRules}</p>
+                        <button class="rules-btn" onclick="event.stopPropagation(); showRules('${game.id}')">
+                            📖 Detailed Rules
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderStats() {
+            const statsContent = document.getElementById('statsContent');
+            
+            if (gameHistory.length === 0) {
+                statsContent.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No games played yet. Start playing to see your stats!</p>';
+                return;
+            }
+
+            // Calculate player statistics
+            const playerStats = {};
+            const gamePlayCounts = {}; // Track how many times each game is played
+            
+            gameHistory.forEach(game => {
+                // Count game plays
+                if (!gamePlayCounts[game.gameName]) {
+                    gamePlayCounts[game.gameName] = {
+                        count: 0,
+                        id: game.gameName.toLowerCase().replace(/\s+/g, '_').replace(/[()]/g, '')
+                    };
+                }
+                gamePlayCounts[game.gameName].count++;
+
+                game.rankings.forEach((player, index) => {
+                    if (!playerStats[player.name]) {
+                        playerStats[player.name] = {
+                            gamesPlayed: 0,
+                            wins: 0,
+                            totalScore: 0,
+                            gameBreakdown: {},
+                            avatar: player.avatar || '⚪' // Get avatar from most recent game
+                        };
+                    }
+                    
+                    // Update avatar to most recent one (since we're going through history newest first)
+                    if (player.avatar) {
+                        playerStats[player.name].avatar = player.avatar;
+                    }
+                    
+                    playerStats[player.name].gamesPlayed++;
+                    playerStats[player.name].totalScore += player.total;
+                    
+                    if (index === 0) {
+                        playerStats[player.name].wins++;
+                    }
+                    
+                    // Track games played by type
+                    if (!playerStats[player.name].gameBreakdown[game.gameName]) {
+                        playerStats[player.name].gameBreakdown[game.gameName] = 0;
+                    }
+                    playerStats[player.name].gameBreakdown[game.gameName]++;
+                });
+            });
+
+            // Get top 3 most played games
+            const topGames = Object.entries(gamePlayCounts)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 3);
+
+            // Calculate derived stats
+            Object.keys(playerStats).forEach(player => {
+                const stats = playerStats[player];
+                stats.winRate = ((stats.wins / stats.gamesPlayed) * 100).toFixed(1);
+                stats.avgScore = (stats.totalScore / stats.gamesPlayed).toFixed(1);
+                stats.favoriteGame = Object.entries(stats.gameBreakdown)
+                    .sort((a, b) => b[1] - a[1])[0][0];
+            });
+
+            // Create leaderboard by wins
+            const leaderboard = Object.entries(playerStats)
+                .sort((a, b) => b[1].wins - a[1].wins);
+
+            let html = '<h3 style="color: #667eea; margin-bottom: 15px;">🏆 Win Leaderboard</h3>';
+            
+            html += leaderboard.map(([name, stats], index) => `
+                <div class="leaderboard-item ${index === 0 ? 'top' : ''}">
+                    <div class="leaderboard-rank">${index === 0 ? '👑' : index + 1}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">
+                            ${stats.avatar !== '⚪' ? `<span class="player-avatar">${stats.avatar}</span>` : ''}
+                            ${name}
+                        </div>
+                        <div class="leaderboard-stats">${stats.wins} wins • ${stats.winRate}% win rate</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add Top 3 Most Played Games
+            if (topGames.length > 0) {
+                html += '<div class="top-games-section">';
+                html += '<h3 style="color: #667eea; margin-bottom: 15px;">🎮 Top 3 Most Played Games</h3>';
+                
+                const medals = ['🥇', '🥈', '🥉'];
+                topGames.forEach(([gameName, data], index) => {
+                    // Find the game object to get its ID
+                    const game = games.find(g => g.name === gameName);
+                    if (game) {
+                        html += `
+                            <div class="top-game-item" onclick="selectGame('${game.id}')">
+                                <span class="top-game-rank">${medals[index]}</span>
+                                <div class="top-game-info">
+                                    <div class="top-game-name">${gameName}</div>
+                                    <div class="top-game-count">Played ${data.count} time${data.count > 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                html += '</div>';
+            }
+
+            html += '<h3 style="color: #667eea; margin: 30px 0 15px 0;">📊 Player Details</h3>';
+
+            leaderboard.forEach(([name, stats]) => {
+                html += `
+                    <div class="stat-card">
+                        <h3>
+                            ${stats.avatar !== '⚪' ? `<span class="player-avatar">${stats.avatar}</span>` : ''}
+                            ${name}
+                        </h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Games Played</span>
+                            <span class="stat-value">${stats.gamesPlayed}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Wins</span>
+                            <span class="stat-value">${stats.wins}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Win Rate</span>
+                            <span class="stat-value">${stats.winRate}%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Average Score</span>
+                            <span class="stat-value">${stats.avgScore}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Favorite Game</span>
+                            <span class="stat-value">${stats.favoriteGame}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            statsContent.innerHTML = html;
+        }
+
+        // Load game history from localStorage
+        // Load groups from localStorage
+        function loadGroups() {
+            const stored = localStorage.getItem('familyGameGroups');
+            if (stored) {
+                try {
+                    groups = JSON.parse(stored);
+                } catch (e) {
+                    groups = {};
+                }
+            }
+            
+            // Ensure Default group exists (will display as "Who's Playing?")
+            if (!groups['Default']) {
+                groups['Default'] = {
+                    players: [],
+                    history: []
+                };
+            }
+            
+            // Migrate old data if it exists
+            const oldHistory = localStorage.getItem('familyGameHistory');
+            if (oldHistory && groups['Default'].history.length === 0) {
+                try {
+                    groups['Default'].history = JSON.parse(oldHistory);
+                    saveGroups();
+                    localStorage.removeItem('familyGameHistory'); // Clean up old storage
+                } catch (e) {
+                    console.log('No old history to migrate');
+                }
+            }
+        }
+
+        // Save groups to localStorage
+        function saveGroups() {
+            localStorage.setItem('familyGameGroups', JSON.stringify(groups));
+        }
+
+        // Load current group setting
+        function loadCurrentGroup() {
+            const stored = localStorage.getItem('currentGroup');
+            if (stored && groups[stored]) {
+                currentGroup = stored;
+            } else {
+                currentGroup = 'Default';
+            }
+            gameHistory = groups[currentGroup].history;
+            populateGroupSelector();
+        }
+
+        // Save current group setting
+        function saveCurrentGroup() {
+            localStorage.setItem('currentGroup', currentGroup);
+        }
+
+        // Switch to a different group - kept for backwards compatibility
+        function switchGroup(groupName) {
+            if (groups[groupName]) {
+                currentGroup = groupName;
+                gameHistory = groups[currentGroup].history;
+                saveCurrentGroup();
+            }
+        }
+
+        // Legacy functions kept for compatibility
+        function loadGameHistory() {
+            // Now handled by loadGroups
+            gameHistory = groups[currentGroup].history;
+        }
+
+        function saveGameHistory() {
+            groups[currentGroup].history = gameHistory;
+            saveGroups();
+        }
+
+        // Group management functions
+        function populateGroupSelector() {
+            const selector = document.getElementById('groupSelector');
+            const userGroups = Object.keys(groups).filter(name => name !== 'Default');
+            
+            if (userGroups.length === 0) {
+                selector.innerHTML = '<option value="">No groups yet - create one!</option>';
+                document.getElementById('noGroupsMessage').style.display = 'block';
+                document.getElementById('playerChecklistContainer').style.display = 'none';
+            } else {
+                selector.innerHTML = userGroups.map(groupName => 
+                    `<option value="${groupName}" ${groupName === currentGroup ? 'selected' : ''}>${groupName}</option>`
+                ).join('');
+                document.getElementById('noGroupsMessage').style.display = 'none';
+            }
+        }
+
+        function showWhosPlayingModal() {
+            populateGroupSelector();
+            
+            // If there are user groups, select the first one and show its players
+            const userGroups = Object.keys(groups).filter(name => name !== 'Default');
+            if (userGroups.length > 0) {
+                const firstGroup = currentGroup !== 'Default' ? currentGroup : userGroups[0];
+                currentGroup = firstGroup;
+                onGroupSelected(firstGroup);
+            }
+            
+            document.getElementById('whosPlayingModal').classList.add('show');
+        }
+
+        function onGroupSelected(groupName) {
+            if (!groupName || groupName === '') return;
+            
+            currentGroup = groupName;
+            gameHistory = groups[currentGroup].history;
+            saveCurrentGroup();
+            
+            const groupPlayers = groups[currentGroup].players || [];
+            
+            if (groupPlayers.length === 0) {
+                document.getElementById('playerChecklistContainer').style.display = 'none';
+                // Could show a message to add players
+            } else {
+                selectedPlayers = [];
+                renderPlayerChecklist();
+                document.getElementById('playerChecklistContainer').style.display = 'block';
+            }
+        }
+
+        function renderPlayerChecklist() {
+            const groupPlayers = groups[currentGroup].players || [];
+            const checklist = document.getElementById('playerChecklist');
+            const continueBtn = document.getElementById('continuePlayersBtn');
+            const allCheckbox = document.getElementById('allPlayersCheckbox');
+            
+            if (groupPlayers.length === 0) {
+                checklist.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No players in this group yet.</p>';
+                continueBtn.disabled = true;
+                return;
+            }
+            
+            checklist.innerHTML = groupPlayers.map((player, index) => {
+                const isSelected = selectedPlayers.some(p => p.name === player.name);
+                return `
+                    <div class="player-selection-item ${isSelected ? 'selected' : ''}" onclick="togglePlayerInChecklist(${index})">
+                        <input type="checkbox" class="player-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); togglePlayerInChecklist(${index})">
+                        <div class="player-selection-info">
+                            ${player.avatar !== '⚪' ? `<span class="player-avatar">${player.avatar}</span>` : ''}
+                            <span style="font-weight: 600;">${player.name}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update All Players checkbox
+            allCheckbox.checked = selectedPlayers.length === groupPlayers.length && groupPlayers.length > 0;
+            
+            // Enable/disable continue button
+            continueBtn.disabled = selectedPlayers.length < 2;
+        }
+
+        function togglePlayerInChecklist(index) {
+            const groupPlayers = groups[currentGroup].players;
+            const player = groupPlayers[index];
+            
+            const selectedIndex = selectedPlayers.findIndex(p => p.name === player.name);
+            
+            if (selectedIndex >= 0) {
+                selectedPlayers.splice(selectedIndex, 1);
+            } else {
+                selectedPlayers.push(player);
+            }
+            
+            renderPlayerChecklist();
+        }
+
+        function toggleAllPlayers() {
+            const groupPlayers = groups[currentGroup].players || [];
+            
+            if (selectedPlayers.length === groupPlayers.length) {
+                // Deselect all
+                selectedPlayers = [];
+            } else {
+                // Select all
+                selectedPlayers = [...groupPlayers];
+            }
+            
+            renderPlayerChecklist();
+        }
+
+        function continueWithSelectedPlayers() {
+            if (selectedPlayers.length < 2) {
+                alert('Please select at least 2 players');
+                return;
+            }
+            
+            players = [...selectedPlayers];
+            closeModal('whosPlayingModal');
+            
+            // Check if there's a pending game that was selected before players
+            const pendingGameId = sessionStorage.getItem('pendingGameId');
+            
+            if (pendingGameId) {
+                // Clear the pending game
+                sessionStorage.removeItem('pendingGameId');
+                
+                // Start the game immediately
+                setTimeout(() => {
+                    selectGame(pendingGameId);
+                }, 100);
+            } else {
+                // Explicitly ensure we're showing the right content
+                // Hide all game screens first
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                // Show main content and board games
+                setTimeout(() => {
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.querySelector('.nav-bar').style.display = 'grid';
+                    showBoardGames();
+                }, 100);
+            }
+        }
+
+        function showManageGroups() {
+            renderGroupsList();
+            document.getElementById('manageGroupsModal').classList.add('show');
+        }
+
+        function renderGroupsList() {
+            const groupsList = document.getElementById('groupsList');
+            const userGroups = Object.keys(groups).filter(name => name !== 'Default');
+            
+            if (userGroups.length === 0) {
+                groupsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No groups created yet. Create your first group above!</p>';
+                return;
+            }
+            
+            groupsList.innerHTML = userGroups.map(groupName => {
+                const group = groups[groupName];
+                const isActive = groupName === currentGroup;
+                const gameCount = group.history.length;
+                const playerCount = group.players.length;
+                
+                return `
+                    <div class="group-item ${isActive ? 'active' : ''}">
+                        <div class="group-info">
+                            <div class="group-name">${groupName}</div>
+                            <div class="group-stats">${playerCount} players • ${gameCount} games played</div>
+                        </div>
+                        <div class="group-actions">
+                            <button class="group-edit-btn" data-group-name="${groupName}" type="button">Edit</button>
+                            <button class="group-delete-btn" data-group-name="${groupName}" type="button">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add event listeners for edit buttons (mobile-friendly)
+            document.querySelectorAll('.group-edit-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const groupName = this.getAttribute('data-group-name');
+                    editGroup(groupName);
+                });
+                
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const groupName = this.getAttribute('data-group-name');
+                    editGroup(groupName);
+                }, { passive: false });
+            });
+            
+            // Add event listeners for delete buttons (mobile-friendly)
+            document.querySelectorAll('.group-delete-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const groupName = this.getAttribute('data-group-name');
+                    deleteGroup(groupName);
+                });
+                
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const groupName = this.getAttribute('data-group-name');
+                    deleteGroup(groupName);
+                }, { passive: false });
+            });
+        }
+
+        function createNewGroup() {
+            const input = document.getElementById('newGroupName');
+            const groupName = input.value.trim();
+            
+            if (!groupName) {
+                alert('Please enter a group name');
+                return;
+            }
+            
+            if (groups[groupName]) {
+                alert('A group with this name already exists');
+                return;
+            }
+            
+            groups[groupName] = {
+                players: [],
+                history: []
+            };
+            
+            saveGroups();
+            input.value = '';
+            renderGroupsList();
+            populateGroupSelector();
+            alert(`Group "${groupName}" created!`);
+        }
+
+        function editGroup(groupName) {
+            // Close manage groups modal and show edit players modal
+            closeModal('manageGroupsModal');
+            
+            // Set this as the current group for editing
+            currentGroup = groupName;
+            gameHistory = groups[currentGroup].history;
+            
+            // Show edit players modal
+            showEditPlayersModal(groupName);
+        }
+
+        function showEditPlayersModal(groupName) {
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.id = 'editPlayersModal';
+            
+            const groupPlayers = groups[groupName].players || [];
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>✏️ Edit Players - ${groupName}</h2>
+                        <button class="close-modal" onclick="closeEditPlayersModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Add New Player</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <input type="text" id="editPlayerNameInput" placeholder="Enter player name" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; margin-bottom: 10px;">
+                            
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #667eea;">Pick Avatar (optional):</label>
+                            <div id="editSelectedAvatarDisplay" style="text-align: center; font-size: 3em; min-height: 70px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                                <span id="editCurrentAvatar">⚪</span>
+                            </div>
+                            <div id="editAvatarPicker" class="edit-avatar-picker"></div>
+                            
+                            <button class="btn btn-primary" onclick="addPlayerToGroup('${groupName}')" style="width: 100%; margin-top: 10px;">Add Player</button>
+                        </div>
+
+                        <h3 style="color: #667eea; margin: 30px 0 15px 0;">Current Players</h3>
+                        <div id="editPlayersList"></div>
+
+                        <button class="btn btn-secondary" onclick="closeEditPlayersModal()" style="width: 100%; margin-top: 20px;">Done</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Initialize
+            editSelectedAvatar = '⚪';
+            renderEditAvatarPicker();
+            renderEditPlayersList(groupName);
+        }
+
+        let editSelectedAvatar = '⚪';
+
+        function renderEditAvatarPicker() {
+            const picker = document.getElementById('editAvatarPicker');
+            if (!picker) return;
+            
+            picker.innerHTML = avatarEmojis.map(emoji => 
+                `<div class="avatar-option ${emoji === editSelectedAvatar ? 'selected' : ''}" onclick="selectEditAvatar('${emoji}')">${emoji}</div>`
+            ).join('');
+        }
+
+        function selectEditAvatar(emoji) {
+            editSelectedAvatar = emoji;
+            const display = document.getElementById('editCurrentAvatar');
+            if (display) {
+                display.textContent = emoji;
+            }
+            
+            // Update visual selection
+            document.querySelectorAll('#editAvatarPicker .avatar-option').forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function addPlayerToGroup(groupName) {
+            const input = document.getElementById('editPlayerNameInput');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Please enter a player name');
+                return;
+            }
+            
+            const groupPlayers = groups[groupName].players || [];
+            
+            // Check if player already exists
+            if (groupPlayers.find(p => p.name === name)) {
+                alert('A player with this name already exists in this group');
+                return;
+            }
+            
+            const newPlayer = { name, avatar: editSelectedAvatar };
+            groupPlayers.push(newPlayer);
+            groups[groupName].players = groupPlayers;
+            
+            saveGroups();
+            
+            // Reset form
+            input.value = '';
+            editSelectedAvatar = '⚪';
+            document.getElementById('editCurrentAvatar').textContent = '⚪';
+            renderEditAvatarPicker();
+            
+            // Refresh player list
+            renderEditPlayersList(groupName);
+        }
+
+        function renderEditPlayersList(groupName) {
+            const list = document.getElementById('editPlayersList');
+            if (!list) return;
+            
+            const groupPlayers = groups[groupName].players || [];
+            
+            if (groupPlayers.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No players in this group yet. Add your first player above!</p>';
+                return;
+            }
+            
+            list.innerHTML = groupPlayers.map((player, index) => `
+                <div class="player-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 8px;">
+                    <span style="font-weight: 600;">
+                        ${player.avatar !== '⚪' ? `<span class="player-avatar">${player.avatar}</span>` : ''}
+                        ${player.name}
+                    </span>
+                    <div>
+                        <button class="edit-player-avatar-btn" onclick="changePlayerAvatarInEdit('${groupName}', ${index})" style="background: #667eea; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.85em; margin-right: 5px;">Change Avatar</button>
+                        <button class="remove-player-btn" onclick="removePlayerFromGroup('${groupName}', ${index})" style="background: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.85em;">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changePlayerAvatarInEdit(groupName, playerIndex) {
+            const groupPlayers = groups[groupName].players;
+            const player = groupPlayers[playerIndex];
+            
+            editSelectedAvatar = player.avatar;
+            document.getElementById('editCurrentAvatar').textContent = player.avatar;
+            renderEditAvatarPicker();
+            
+            // Scroll to avatar picker
+            document.getElementById('editSelectedAvatarDisplay').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Update the player's avatar when selection changes
+            const originalSelectEditAvatar = window.selectEditAvatar;
+            window.selectEditAvatar = function(emoji) {
+                editSelectedAvatar = emoji;
+                document.getElementById('editCurrentAvatar').textContent = emoji;
+                
+                // Update visual selection
+                document.querySelectorAll('#editAvatarPicker .avatar-option').forEach(opt => opt.classList.remove('selected'));
+                event.target.classList.add('selected');
+                
+                // Update player avatar
+                groupPlayers[playerIndex].avatar = emoji;
+                groups[groupName].players = groupPlayers;
+                saveGroups();
+                renderEditPlayersList(groupName);
+                
+                // Restore original function
+                window.selectEditAvatar = originalSelectEditAvatar;
+            };
+        }
+
+        function removePlayerFromGroup(groupName, playerIndex) {
+            if (!confirm('Remove this player from the group?')) {
+                return;
+            }
+            
+            const groupPlayers = groups[groupName].players;
+            groupPlayers.splice(playerIndex, 1);
+            groups[groupName].players = groupPlayers;
+            
+            saveGroups();
+            renderEditPlayersList(groupName);
+        }
+
+        function closeEditPlayersModal() {
+            const modal = document.getElementById('editPlayersModal');
+            if (modal) {
+                modal.remove();
+            }
+            
+            // Refresh the manage groups modal if it was open
+            showManageGroups();
+        }
+
+        function deleteGroup(groupName) {
+            if (groupName === 'Default') {
+                alert('Cannot delete the Default group');
+                return;
+            }
+            
+            if (!confirm(`Delete "${groupName}" and all its data?`)) {
+                return;
+            }
+            
+            delete groups[groupName];
+            
+            if (currentGroup === groupName) {
+                switchGroup('Default');
+            }
+            
+            saveGroups();
+            renderGroupsList();
+            populateGroupSelector();
+        }
+
+        let selectedPlayers = []; // Players selected for current game
+
+        function savePlayerToGroup(player) {
+            // Add player to current group's roster if not already there
+            const groupPlayers = groups[currentGroup].players || [];
+            if (!groupPlayers.find(p => p.name === player.name)) {
+                groupPlayers.push(player);
+                groups[currentGroup].players = groupPlayers;
+                saveGroups();
+            }
+        }
+
+        function selectGame(gameId) {
+            currentGame = games.find(g => g.id === gameId);
+            
+            // Check if players have been selected
+            if (players.length < 2) {
+                // On mobile or desktop, open the Who's Playing modal instead of just alerting
+                showWhosPlayingModal();
+                // Store the selected game so we can start it after player selection
+                sessionStorage.setItem('pendingGameId', gameId);
+                return;
+            }
+            
+            // Initialize scores and start game
+            currentRound = 1;
+            players.forEach(player => {
+                scores[player.name] = [];
+            });
+            showScoringScreen();
+        }
+
+        function showScoringScreen() {
+            document.getElementById('scoringGameName').textContent = currentGame.name;
+            
+            // Show win condition info if applicable
+            const condition = winConditions[currentGame.id];
+            let roundInfoText = `Round ${currentRound}`;
+            if (condition) {
+                if (condition.type === 'first_to_score') {
+                    roundInfoText += ` • First to ${condition.target} ${condition.higher_wins ? 'wins' : '(lowest wins)'}`;
+                } else if (condition.type === 'highest_after_rounds') {
+                    roundInfoText += ` of ${condition.rounds} • Highest wins`;
+                } else if (condition.type === 'rounds_then_highest') {
+                    roundInfoText += ` of ${condition.rounds} • Highest wins`;
+                } else if (condition.type === 'match_play') {
+                    roundInfoText += ` • Match to ${condition.target}`;
+                }
+            }
+            document.getElementById('roundInfo').textContent = roundInfoText;
+            
+            const scoreInputsDiv = document.getElementById('scoreInputs');
+            scoreInputsDiv.innerHTML = players.map(player => {
+                const currentScore = scores[player.name][currentRound - 1] || 0;
+                const totalScore = scores[player.name].reduce((a, b) => a + b, 0);
+                
+                return `
+                    <div class="player-score">
+                        <div class="player-score-header">
+                            <span class="player-name">
+                                ${player.avatar !== '⚪' ? `<span class="player-avatar">${player.avatar}</span>` : ''}
+                                ${player.name}
+                            </span>
+                            <span class="total-score">Total: ${totalScore}</span>
+                        </div>
+                        <div class="score-input-row">
+                            <input type="number" 
+                                   id="score-${player.name}" 
+                                   value="${currentScore}"
+                                   placeholder="Score"
+                                   onchange="updateScore('${player.name}', this.value)">
+                        </div>
+                        <div class="quick-score">
+                            ${currentGame.quickScores.map(val => 
+                                `<button onclick="setQuickScore('${player.name}', ${val})">${val > 0 ? '+' : ''}${val}</button>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            showScreen('scoring');
+        }
+
+        function setQuickScore(player, value) {
+            document.getElementById(`score-${player}`).value = value;
+            updateScore(player, value);
+        }
+
+        function updateScore(player, value) {
+            scores[player][currentRound - 1] = parseInt(value) || 0;
+            // Update total display
+            const totalScore = scores[player].reduce((a, b) => a + b, 0);
+            const totalSpan = document.querySelector(`#score-${player}`).closest('.player-score').querySelector('.total-score');
+            totalSpan.textContent = `Total: ${totalScore}`;
+            
+            // Check for win condition
+            checkWinCondition();
+        }
+
+        function checkWinCondition() {
+            const condition = winConditions[currentGame.id];
+            if (!condition) return false;
+
+            const totals = players.map(player => ({
+                name: player.name,
+                total: scores[player.name].reduce((a, b) => a + b, 0)
+            }));
+
+            let winner = null;
+
+            switch (condition.type) {
+                case 'first_to_score':
+                    // Check if any player has reached target score
+                    const qualifyingPlayers = totals.filter(p => {
+                        if (condition.higher_wins) {
+                            return p.total >= condition.target;
+                        } else {
+                            return p.total >= condition.target;
+                        }
+                    });
+                    
+                    if (qualifyingPlayers.length > 0) {
+                        if (condition.higher_wins) {
+                            winner = qualifyingPlayers.reduce((max, p) => p.total > max.total ? p : max);
+                        } else {
+                            winner = qualifyingPlayers.reduce((min, p) => p.total < min.total ? p : min);
+                        }
+                    }
+                    break;
+
+                case 'highest_after_rounds':
+                    if (currentRound >= condition.rounds) {
+                        winner = totals.reduce((max, p) => p.total > max.total ? p : max);
+                    }
+                    break;
+
+                case 'rounds_then_highest':
+                    if (currentRound >= condition.rounds) {
+                        winner = totals.reduce((max, p) => p.total > max.total ? p : max);
+                    }
+                    break;
+
+                case 'match_play':
+                    const matchWinner = totals.find(p => p.total >= condition.target);
+                    if (matchWinner) {
+                        winner = matchWinner;
+                    }
+                    break;
+            }
+
+            if (winner) {
+                showWinnerAlert(winner);
+                return true;
+            }
+            return false;
+        }
+
+        function showWinnerAlert(winner) {
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px; text-align: center;">
+                    <div style="font-size: 4em; margin-bottom: 20px;">🏆</div>
+                    <h2 style="color: #667eea; margin-bottom: 15px;">Winner!</h2>
+                    <p style="font-size: 1.5em; font-weight: 700; color: #333; margin-bottom: 10px;">
+                        ${winner.name}
+                    </p>
+                    <p style="font-size: 1.2em; color: #666; margin-bottom: 30px;">
+                        Final Score: ${winner.total}
+                    </p>
+                    <button class="btn btn-primary" onclick="closeWinnerAlert(this); finishGame();">
+                        View Final Results
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeWinnerAlert(this);" style="margin-top: 10px;">
+                        Continue Playing
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeWinnerAlert(button) {
+            const modal = button.closest('.modal');
+            modal.remove();
+        }
+
+        function nextRound() {
+            // Ensure all current round scores are recorded
+            players.forEach(player => {
+                if (scores[player.name][currentRound - 1] === undefined) {
+                    scores[player.name][currentRound - 1] = 0;
+                }
+            });
+            
+            // Check if someone has won before moving to next round
+            if (checkWinCondition()) {
+                return; // Don't advance round if someone won
+            }
+            
+            currentRound++;
+            showScoringScreen();
+        }
+
+        function previousRound() {
+            if (currentRound > 1) {
+                currentRound--;
+                showScoringScreen();
+            }
+        }
+
+        let diceRollHistory = [];
+
+        function rollDice() {
+            const diceType = document.getElementById('diceType').value;
+            const [numDice, sides] = diceType.split('d').map(Number);
+            
+            const resultDisplay = document.getElementById('diceResult');
+            const historyDisplay = document.getElementById('diceHistory');
+            
+            // Show rolling animation
+            resultDisplay.textContent = '🎲'.repeat(numDice);
+            resultDisplay.style.animation = 'none';
+            
+            // Trigger reflow to restart animation
+            void resultDisplay.offsetWidth;
+            resultDisplay.style.animation = 'diceRoll 0.5s ease-out';
+            
+            setTimeout(() => {
+                const rolls = [];
+                let total = 0;
+                
+                for (let i = 0; i < numDice; i++) {
+                    const roll = Math.floor(Math.random() * sides) + 1;
+                    rolls.push(roll);
+                    total += roll;
+                }
+                
+                // Display result with actual dice faces
+                if (sides === 6) {
+                    // Show actual dice faces for d6
+                    resultDisplay.innerHTML = `
+                        <div style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                            ${rolls.map(r => getDiceHTML(r)).join('')}
+                            ${numDice > 1 ? `<div style="font-size: 0.5em; color: #999; margin: 0 5px;">=</div><div style="font-size: 0.8em; padding: 15px 20px; background: white; border: 3px solid #667eea; border-radius: 10px; font-weight: 700;">${total}</div>` : ''}
+                        </div>
+                    `;
+                } else {
+                    // For other dice types, show numbers
+                    if (numDice === 1) {
+                        resultDisplay.innerHTML = `<div style="font-size: 1em; padding: 20px 25px; background: white; border: 3px solid #667eea; border-radius: 10px; font-weight: 700;">${rolls[0]}</div>`;
+                    } else {
+                        resultDisplay.innerHTML = `
+                            <div style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                                ${rolls.map(r => `<span style="font-size: 0.6em; padding: 10px 15px; background: white; border: 2px solid #667eea; border-radius: 8px;">${r}</span>`).join('')}
+                                <span style="font-size: 0.5em; color: #999;"> = </span>
+                                <span style="font-size: 0.8em; padding: 15px 20px; background: white; border: 3px solid #667eea; border-radius: 10px; font-weight: 700;">${total}</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Add to history
+                const rollText = numDice === 1 ? `${rolls[0]}` : `${rolls.join(' + ')} = ${total}`;
+                diceRollHistory.unshift(`${diceType}: ${rollText}`);
+                if (diceRollHistory.length > 5) diceRollHistory.pop();
+                
+                historyDisplay.textContent = `Last rolls: ${diceRollHistory.join(' • ')}`;
+            }, 500);
+        }
+
+        function getDiceHTML(value) {
+            // Return HTML for a dice face with dots
+            const dotPatterns = {
+                1: '<div class="dice-dot center"></div>',
+                2: '<div class="dice-dot top-left"></div><div class="dice-dot bottom-right"></div>',
+                3: '<div class="dice-dot top-left"></div><div class="dice-dot center"></div><div class="dice-dot bottom-right"></div>',
+                4: '<div class="dice-dot top-left"></div><div class="dice-dot top-right"></div><div class="dice-dot bottom-left"></div><div class="dice-dot bottom-right"></div>',
+                5: '<div class="dice-dot top-left"></div><div class="dice-dot top-right"></div><div class="dice-dot center"></div><div class="dice-dot bottom-left"></div><div class="dice-dot bottom-right"></div>',
+                6: '<div class="dice-dot top-left"></div><div class="dice-dot top-right"></div><div class="dice-dot middle-left"></div><div class="dice-dot middle-right"></div><div class="dice-dot bottom-left"></div><div class="dice-dot bottom-right"></div>'
+            };
+            
+            return `<div class="dice-face">${dotPatterns[value]}</div>`;
+        }
+
+        function getDiceFace(value, sides) {
+            // Return Unicode dice faces for standard d6
+            if (sides === 6) {
+                const faces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+                return faces[value - 1];
+            }
+            // For other dice, just return the number
+            return value;
+        }
+
+        function finishGame() {
+            // Ensure all scores are recorded
+            players.forEach(player => {
+                if (scores[player.name][currentRound - 1] === undefined) {
+                    scores[player.name][currentRound - 1] = 0;
+                }
+            });
+            
+            showResults();
+        }
+
+        function showResults() {
+            // Calculate totals and rank
+            const rankings = players.map(player => ({
+                name: player.name,
+                avatar: player.avatar,
+                total: scores[player.name].reduce((a, b) => a + b, 0),
+                rounds: scores[player.name]
+            })).sort((a, b) => b.total - a.total);
+
+            // Save to history
+            saveCompletedGame(rankings);
+
+            // Display leaderboard
+            const leaderboard = document.getElementById('leaderboard');
+            leaderboard.innerHTML = rankings.map((player, index) => `
+                <div class="rank-item ${index === 0 ? 'winner' : ''}">
+                    <div class="rank-number">${index === 0 ? '🏆' : index + 1}</div>
+                    <div class="rank-info">
+                        <div class="name">
+                            ${player.avatar !== '⚪' ? `<span class="player-avatar">${player.avatar}</span>` : ''}
+                            ${player.name}
+                        </div>
+                        <div class="score">${player.total} points</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Display round history
+            const historyDiv = document.getElementById('roundHistory');
+            let historyHTML = '';
+            for (let i = 0; i < currentRound; i++) {
+                historyHTML += `<div class="history-item">
+                    <strong>Round ${i + 1}:</strong> ${players.map(p => 
+                        `${p.avatar !== '⚪' ? p.avatar + ' ' : ''}${p.name}: ${scores[p.name][i] || 0}`
+                    ).join(', ')}
+                </div>`;
+            }
+            historyDiv.innerHTML = historyHTML;
+
+            showScreen('results');
+        }
+
+        function saveCompletedGame(rankings) {
+            const gameRecord = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                gameName: currentGame.name,
+                gameIcon: currentGame.icon,
+                players: players, // This now includes {name, avatar} objects
+                scores: scores,
+                winner: rankings[0],
+                rankings: rankings,
+                totalRounds: currentRound
+            };
+            
+            gameHistory.unshift(gameRecord); // Add to beginning
+            saveGameHistory();
+        }
+
+        function showRules(gameId) {
+            const game = games.find(g => g.id === gameId);
+            if (!game) return;
+
+            document.getElementById('modalGameIcon').textContent = game.icon;
+            document.getElementById('modalGameName').textContent = game.name;
+            
+            const content = `
+                <h3>Overview</h3>
+                <p><strong>Players:</strong> ${game.players}</p>
+                <p><strong>Duration:</strong> ${game.duration}</p>
+                <p><strong>Age Range:</strong> ${game.ageRange}</p>
+                <p>${game.description}</p>
+                
+                <h3>Setup</h3>
+                <p>${game.setup}</p>
+                
+                <h3>How to Score</h3>
+                <p>${game.scoringRules}</p>
+                
+                <h3>Detailed Rules</h3>
+                <p>${game.detailedRules}</p>
+            `;
+            
+            document.getElementById('modalRulesContent').innerHTML = content;
+            document.getElementById('rulesModal').classList.add('show');
+        }
+
+        function showHistoryTab() {
+            document.querySelectorAll('.history-tab button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.history-tab button')[0].classList.add('active');
+            document.getElementById('historyTabContent').style.display = 'block';
+            document.getElementById('statsTabContent').style.display = 'none';
+        }
+
+        function showStatsTab() {
+            document.querySelectorAll('.history-tab button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.history-tab button')[1].classList.add('active');
+            document.getElementById('historyTabContent').style.display = 'none';
+            document.getElementById('statsTabContent').style.display = 'block';
+            renderStats();
+        }
+
+        function loadHistory() {
+            const content = document.getElementById('historyContent');
+            
+            if (gameHistory.length === 0) {
+                content.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No games played yet. Start a game to build your history!</p>';
+                return;
+            }
+            
+            content.innerHTML = gameHistory.map((game, index) => {
+                const date = new Date(game.date);
+                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const winnerAvatar = game.winner.avatar && game.winner.avatar !== '⚪' ? game.winner.avatar + ' ' : '';
+                
+                return `
+                    <div class="game-history-item">
+                        <div class="date">${dateStr}</div>
+                        <div class="game-name">${game.gameIcon} ${game.gameName}</div>
+                        <div class="winner">🏆 Winner: ${winnerAvatar}${game.winner.name} (${game.winner.total} points)</div>
+                        <div class="scores">
+                            ${game.rankings.map((p, idx) => {
+                                const avatar = p.avatar && p.avatar !== '⚪' ? p.avatar + ' ' : '';
+                                return `${idx + 1}. ${avatar}${p.name}: ${p.total} pts`;
+                            }).join(' • ')}
+                        </div>
+                        <div style="font-size: 0.85em; color: #888; margin-top: 5px;">
+                            ${game.totalRounds} rounds played
+                        </div>
+                        <button class="delete-history-btn" data-index="${index}" type="button" style="cursor: pointer; -webkit-tap-highlight-color: rgba(255, 71, 87, 0.3);">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            // Use both click and touchend for mobile
+            const handleDelete = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let target = e.target;
+                // Check if we clicked the button or its contents
+                if (!target.classList.contains('delete-history-btn')) {
+                    target = target.closest('.delete-history-btn');
+                }
+                
+                if (target && target.classList.contains('delete-history-btn')) {
+                    const index = parseInt(target.getAttribute('data-index'));
+                    if (!isNaN(index)) {
+                        // Change button text for feedback
+                        target.textContent = 'Deleting...';
+                        target.style.background = '#999';
+                        
+                        // Small delay for visual feedback
+                        setTimeout(() => {
+                            gameHistory.splice(index, 1);
+                            saveGameHistory();
+                            loadHistory();
+                        }, 200);
+                    }
+                }
+            };
+            
+            content.addEventListener('click', handleDelete, false);
+            content.addEventListener('touchend', handleDelete, false);
+        }
+
+        // Make function globally accessible
+        window.deleteGameByIndex = function(index) {
+            gameHistory.splice(index, 1);
+            saveGameHistory();
+            showHistory();
+        };
+
+        function deleteGameFromHistory(gameId) {
+            gameHistory = gameHistory.filter(g => g.id !== gameId);
+            saveGameHistory();
+            showHistory(); // Refresh display
+        }
+
+        function clearAllHistory() {
+            const groupName = currentGroup === 'Default' ? 'this group' : currentGroup;
+            
+            // Show custom confirmation modal instead of native confirm
+            document.getElementById('confirmClearMessage').textContent = 
+                `Are you sure you want to clear ALL game history for ${groupName}? This cannot be undone.`;
+            document.getElementById('confirmClearModal').classList.add('show');
+        }
+
+        function confirmClearHistory() {
+            // Close modal
+            closeModal('confirmClearModal');
+            
+            // Clear the history
+            gameHistory = [];
+            groups[currentGroup].history = [];
+            saveGroups();
+            
+            // Reload the history display
+            loadHistory();
+        }
+
+        function cancelClearHistory() {
+            closeModal('confirmClearModal');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        function newGame() {
+            currentGame = null;
+            players = [];
+            currentRound = 1;
+            scores = {};
+            showWhosPlayingModal();
+        }
+
+        function returnToHome() {
+            // Return to board games view, keeping current players selected
+            currentGame = null;
+            currentRound = 1;
+            scores = {};
+            showBoardGames();
+            
+            // Scroll to top of page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Enter key support for adding players
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            const playerInput = document.getElementById('playerNameInput');
+            if (playerInput) {
+                playerInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addPlayer();
+                    }
+                });
+            }
+            
+            // Setup clear history button with both click and touch
+            const setupClearButton = function() {
+                const btn = document.getElementById('clearHistoryBtn');
+                if (btn && !btn.dataset.setupDone) {
+                    btn.dataset.setupDone = 'true';
+                    
+                    let touchHandled = false;
+                    
+                    btn.addEventListener('touchstart', function(e) {
+                        touchHandled = true;
+                        e.preventDefault();
+                        clearAllHistory();
+                    }, { passive: false });
+                    
+                    btn.addEventListener('click', function(e) {
+                        if (!touchHandled) {
+                            e.preventDefault();
+                            clearAllHistory();
+                        }
+                        touchHandled = false;
+                    });
+                }
+            };
+            
+            // Setup immediately
+            setupClearButton();
+            
+            // Also setup when stats are shown (in case button wasn't in DOM yet)
+            const originalShowStats = showStats;
+            showStats = function() {
+                originalShowStats();
+                setTimeout(setupClearButton, 100);
+            };
+        });
+    </script>
+</body>
+</html>

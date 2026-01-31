@@ -1,2 +1,2 @@
-# family-game-scorer
+# Games-Night
 Game scorer for groups
